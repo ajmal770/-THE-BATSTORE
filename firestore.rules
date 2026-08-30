@@ -1,0 +1,71 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 1. Products Collection - Public Read, Admin/Authenticated Write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 2. Orders Collection - Users can read/write their own orders, Admins can read all
+    match /orders/{orderId} {
+      allow read, write: if true; // Set to isAuthenticated() in production
+    }
+
+    // 3. User Profiles & Vault - Users read and write only their own profile
+    match /profiles/{userId} {
+      allow read, write: if true; // Set to isOwner(userId) in strict production
+    }
+
+    // 4. Categories Collection - Public Read
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 5. Coupons Collection - Public Read for promo validation
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 6. Customers Directory - Authenticated access
+    match /customers/{customerId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // 7. Banners Collection - Public Read for homepage display
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 8. Brands Collection - Public Read
+    match /brands/{brandId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 9. Store Settings - Public Read for store configuration
+    match /settings/{settingDoc=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 10. Notifications Collection - Read/Write for notifications
+    match /notifications/{notificationId} {
+      allow read, write: if true;
+    }
+  }
+}
