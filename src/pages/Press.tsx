@@ -10,10 +10,10 @@ const pressArticles = [
     id: 1,
     outlet: 'TechCrunch',
     logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&q=80',
-    title: 'PostScout Unveils Next-Gen AI Multi-Language Shopping Ecosystem',
+    title: 'The BatStore Unveils Next-Gen AI Multi-Language Shopping Ecosystem',
     date: 'July 15, 2026',
     category: 'Technology',
-    snippet: 'PostScout is breaking global barriers by introducing instant 10+ native language translation with real-time currency conversion and sub-second inventory sync.',
+    snippet: 'The BatStore is breaking global barriers by introducing instant 10+ native language translation with real-time currency conversion and sub-second inventory sync.',
     link: 'https://techcrunch.com',
   },
   {
@@ -23,27 +23,27 @@ const pressArticles = [
     title: 'Top 10 E-Commerce Platforms Revolutionizing International Logistics',
     date: 'June 28, 2026',
     category: 'Industry Award',
-    snippet: 'Forbes names PostScout among the fastest-growing cross-border commerce networks, citing 99.8% on-time delivery metrics across 150 countries.',
+    snippet: 'Forbes names The BatStore among the fastest-growing cross-border commerce networks, citing 99.8% on-time delivery metrics across 150 countries.',
     link: 'https://forbes.com',
   },
   {
     id: 3,
     outlet: 'Bloomberg',
     logo: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=150&q=80',
-    title: 'PostScout Reaches 25 Million Delivered Orders Benchmark in Q2',
+    title: 'The BatStore Reaches 25 Million Delivered Orders Benchmark in Q2',
     date: 'May 10, 2026',
     category: 'Financial News',
-    snippet: 'With a 140% year-over-year order surge, PostScout continues its aggressive international fulfillment expansion in Europe and APAC.',
+    snippet: 'With a 140% year-over-year order surge, The BatStore continues its aggressive international fulfillment expansion in Europe and APAC.',
     link: 'https://bloomberg.com',
   },
   {
     id: 4,
     outlet: 'Wired',
     logo: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150&q=80',
-    title: 'Inside PostScout’s Glassmorphic UI & Ultra-Fast Shopping Engine',
+    title: 'Inside The BatStore’s Glassmorphic UI & Ultra-Fast Shopping Engine',
     date: 'April 04, 2026',
     category: 'Design & UX',
-    snippet: 'How PostScout combined Tailwind CSS, micro-animations, and instant state management to craft the most responsive storefront of 2026.',
+    snippet: 'How The BatStore combined Tailwind CSS, micro-animations, and instant state management to craft the most responsive storefront of 2026.',
     link: 'https://wired.com',
   },
 ];
@@ -51,13 +51,13 @@ const pressArticles = [
 const pressReleases = [
   {
     id: 'PR-2026-04',
-    title: 'PostScout Expands Carbon-Neutral Express Shipping to 50 New Cities',
+    title: 'The BatStore Expands Carbon-Neutral Express Shipping to 50 New Cities',
     date: 'July 01, 2026',
     fileSize: '1.4 MB PDF',
   },
   {
     id: 'PR-2026-03',
-    title: 'PostScout Reports Record Black Friday & Cyber Week Volume',
+    title: 'The BatStore Reports Record Black Friday & Cyber Week Volume',
     date: 'May 20, 2026',
     fileSize: '2.1 MB PDF',
   },
@@ -104,7 +104,7 @@ export default function Press() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-6"
           >
             <Newspaper size={14} />
-            <span>PostScout Press & Media Room</span>
+            <span>The BatStore Press & Media Room</span>
           </motion.div>
 
           <motion.h1
@@ -122,7 +122,7 @@ export default function Press() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8"
           >
-            Stay updated with the latest company news, media coverage, product features, and official brand assets from PostScout Enterprise.
+            Stay updated with the latest company news, media coverage, product features, and official brand assets from The BatStore Enterprise.
           </motion.p>
         </div>
       </section>
@@ -134,7 +134,7 @@ export default function Press() {
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-md mb-3 border border-blue-100">
               <Globe size={14} /> Global Coverage
             </div>
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">PostScout in the News</h2>
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">The BatStore in the News</h2>
           </div>
           <p className="text-xs text-slate-500 max-w-sm">
             Read what leading tech and business publications are saying about our platform.
@@ -254,7 +254,7 @@ export default function Press() {
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Journalist & PR Inquiries</h2>
             <p className="text-slate-300 text-xs sm:text-sm">
-              Are you a journalist, editor, or analyst covering e-commerce and AI technology? Get in touch with our communications team directly at <span className="text-blue-400 font-bold">press@postscout.com</span> or use the form below.
+              Are you a journalist, editor, or analyst covering e-commerce and AI technology? Get in touch with our communications team directly at <span className="text-blue-400 font-bold">press@thebatstore.com</span> or use the form below.
             </p>
           </div>
 

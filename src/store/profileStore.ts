@@ -80,7 +80,7 @@ export const useProfileStore = create<ProfileState>()(
       removeCard: (id) => set((state) => ({ savedCards: state.savedCards.filter(c => c.id !== id) })),
     }),
     {
-      name: 'postscout-profile-storage',
+      name: 'thebatstore-profile-storage',
     }
   )
 );

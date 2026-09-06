@@ -18,7 +18,7 @@ const timeline = [
   {
     year: '2021',
     title: 'The Inception',
-    description: 'PostScout was founded with a mission to simplify cross-border e-commerce and deliver ultra-fast logistics.',
+    description: 'The BatStore was founded with a mission to simplify cross-border e-commerce and deliver ultra-fast logistics.',
     icon: Sparkles,
   },
   {
@@ -152,7 +152,7 @@ export default function About() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10 font-normal"
           >
-            PostScout is built for modern shoppers. We combine lightning-fast logistics, state-of-the-art AI recommendations, and multi-language support to bring millions of premium products straight to your door.
+            The BatStore is built for modern shoppers. We combine lightning-fast logistics, state-of-the-art AI recommendations, and multi-language support to bring millions of premium products straight to your door.
           </motion.p>
 
           <motion.div
@@ -292,7 +292,7 @@ export default function About() {
                   className="space-y-4 text-slate-600 text-sm leading-relaxed"
                 >
                   <p>
-                    We are dedicated to minimizing our carbon footprint. 100% of PostScout packaging is recyclable, and we partner with carbon-offset logistics networks across all major transit hubs.
+                    We are dedicated to minimizing our carbon footprint. 100% of The BatStore packaging is recyclable, and we partner with carbon-offset logistics networks across all major transit hubs.
                   </p>
                   <p className="font-semibold text-slate-800">
                     Shopping with us means supporting responsible, sustainable global commerce.
@@ -318,7 +318,7 @@ export default function About() {
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 group">
               <img
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
-                alt="PostScout Team Collaborating"
+                alt="The BatStore Team Collaborating"
                 className="w-full h-[440px] object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
@@ -330,7 +330,7 @@ export default function About() {
                     PS
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">PostScout Engineering Hub</h4>
+                    <h4 className="text-sm font-bold text-slate-900">The BatStore Engineering Hub</h4>
                     <p className="text-xs text-slate-500 font-medium">Powering 25M+ global deliveries yearly</p>
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export default function About() {
             <Rocket size={14} /> Our Journey
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            How PostScout Transformed Global Shopping
+            How The BatStore Transformed Global Shopping
           </h2>
         </div>
 
@@ -431,7 +431,7 @@ export default function About() {
               <Users size={14} /> Executive Leadership
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Meet the Visionaries Behind PostScout
+              Meet the Visionaries Behind The BatStore
             </h2>
           </div>
 
@@ -514,7 +514,7 @@ export default function About() {
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 font-semibold">Email Us Directly</p>
-                    <p className="text-sm font-bold text-white">support@postscout.com</p>
+                    <p className="text-sm font-bold text-white">support@thebatstore.com</p>
                   </div>
                 </div>
 
@@ -555,7 +555,7 @@ export default function About() {
                     </div>
                     <h3 className="text-2xl font-bold text-white">Message Sent Successfully!</h3>
                     <p className="text-xs text-slate-300 max-w-sm mx-auto">
-                      Thank you for reaching out. A PostScout support representative has received your request and will reply shortly.
+                      Thank you for reaching out. A The BatStore support representative has received your request and will reply shortly.
                     </p>
                   </motion.div>
                 ) : (

@@ -315,16 +315,16 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     Portuguese: 'Endereço da Sede Registrada'
   },
   'footer.rights': {
-    English: 'PostScout Enterprise. All rights reserved.',
-    Spanish: 'PostScout Enterprise. Todos los derechos reservados.',
-    French: 'PostScout Enterprise. Tous droits réservés.',
-    German: 'PostScout Enterprise. Alle Rechte vorbehalten.',
-    Chinese: 'PostScout 企业集团 版权所有。',
-    Japanese: 'PostScout Enterprise. 无断転載を禁じます。',
-    Korean: 'PostScout Enterprise. 판권 소유.',
-    Arabic: 'PostScout Enterprise. جميع الحقوق محفوظة.',
-    Hindi: 'PostScout Enterprise. सर्वाधिकार सुरक्षित।',
-    Portuguese: 'PostScout Enterprise. Todos os direitos reservados.'
+    English: 'The BatStore Enterprise. All rights reserved.',
+    Spanish: 'The BatStore Enterprise. Todos los derechos reservados.',
+    French: 'The BatStore Enterprise. Tous droits réservés.',
+    German: 'The BatStore Enterprise. Alle Rechte vorbehalten.',
+    Chinese: 'The BatStore 企业集团 版权所有。',
+    Japanese: 'The BatStore Enterprise. 无断転載を禁じます。',
+    Korean: 'The BatStore Enterprise. 판권 소유.',
+    Arabic: 'The BatStore Enterprise. جميع الحقوق محفوظة.',
+    Hindi: 'The BatStore Enterprise. सर्वाधिकार सुरक्षित।',
+    Portuguese: 'The BatStore Enterprise. Todos os direitos reservados.'
   },
 
   // Home Page Banner / Hero
@@ -412,7 +412,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const LANGUAGE_STORAGE_KEY = 'postscout_app_language';
+const LANGUAGE_STORAGE_KEY = 'thebatstore_app_language';
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeLang, setActiveLangState] = useState<LanguageItem>(() => {

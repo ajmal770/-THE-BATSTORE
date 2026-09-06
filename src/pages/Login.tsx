@@ -80,7 +80,7 @@ const Login: React.FC = () => {
       const { registeredUsers, adminAccounts } = useAuthStore.getState();
 
       // 1. Check Super Admin by email ID
-      if (emailLower === 'superadmin@postscout.com' || emailLower.includes('superadmin')) {
+      if (emailLower === 'superadmin@thebatstore.com' || emailLower.includes('superadmin')) {
         if (password !== 'SuperAdmin@123' && password !== 'admin123') {
           setError('Incorrect password for Super Admin account.');
           return;
@@ -99,7 +99,7 @@ const Login: React.FC = () => {
       const matchedAdmin = adminAccounts.find(
         (a) => a.email.toLowerCase() === emailLower
       );
-      if (matchedAdmin || emailLower === 'admin@postscout.com') {
+      if (matchedAdmin || emailLower === 'admin@thebatstore.com') {
         const adminPass = matchedAdmin?.password || 'Admin@123';
         if (password !== adminPass && password !== 'admin123') {
           setError('Incorrect password for this Admin account.');

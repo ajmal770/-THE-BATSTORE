@@ -1073,7 +1073,7 @@ const Profile: React.FC = () => {
                       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ profile: formData, orders: userOrders }, null, 2));
                       const downloadAnchor = document.createElement('a');
                       downloadAnchor.setAttribute("href", dataStr);
-                      downloadAnchor.setAttribute("download", `postscout_account_data_${user?.uid || 'export'}.json`);
+                      downloadAnchor.setAttribute("download", `thebatstore_account_data_${user?.uid || 'export'}.json`);
                       document.body.appendChild(downloadAnchor);
                       downloadAnchor.click();
                       downloadAnchor.remove();

@@ -12,7 +12,7 @@ export const SEO: React.FC<SEOProps> = ({
   title, 
   description, 
   type = 'website', 
-  name = 'PostScout Enterprise' 
+  name = 'The BatStore Enterprise' 
 }) => {
   return (
     <Helmet>

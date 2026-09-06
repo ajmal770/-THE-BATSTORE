@@ -291,10 +291,13 @@ const MobileMenuDrawer: React.FC<{ isOpen: boolean, onClose: () => void, user: a
               {/* Header */}
               <div className="flex justify-between items-start mb-6">
                 <Link to="/" onClick={onClose} className="flex items-center gap-2.5">
-                  <img src="/logo.png" alt="The BatStore Logo" className="h-10 w-auto" />
                   <div className="flex flex-col">
-                    <span className="text-xl font-black text-[#0b1021] leading-none tracking-wide">THE BATSTORE</span>
-                    <span className="text-[10px] font-bold text-gray-400 tracking-wider">Discover • Shop • Save</span>
+                    <span className="text-xl font-black text-[#0b1021] leading-none tracking-wide flex items-center gap-1.5">
+                      THE
+                      <img src="/logo.svg" alt="Bat Logo" className="h-5 w-auto object-contain" />
+                      STORE
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-400 tracking-wider mt-1.5">Discover • Shop • Save</span>
                   </div>
                 </Link>
                 <button onClick={onClose} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer text-gray-700">
@@ -741,16 +744,11 @@ export const PublicNavbar: React.FC = () => {
             </button>
 
             {/* 3D Animated Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group mr-auto md:mr-0">
-              <motion.div 
-                whileHover={{ rotateY: 180, scale: 1.1 }}
-                transition={{ duration: 0.6, ease: 'easeInOut' }}
-                className="relative cursor-pointer"
-              >
-                <img src="/logo.png" alt="The BatStore Logo" className="h-10 w-auto relative z-10 drop-shadow-md" />
-              </motion.div>
-              <span className="text-xl font-black text-gray-900 tracking-wider">
-                THE BAT<span className="text-sapphire font-black">STORE</span>
+            <Link to="/" className="flex items-center group mr-auto md:mr-0">
+              <span className="text-xl font-black text-gray-900 tracking-wider flex items-center gap-2">
+                THE
+                <img src="/logo.svg" alt="Bat Logo" className="h-6 w-auto object-contain" />
+                <span className="text-sapphire font-black">STORE</span>
               </span>
             </Link>
 

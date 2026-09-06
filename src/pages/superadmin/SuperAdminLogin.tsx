@@ -5,7 +5,7 @@ import { useAuthStore } from '../../store/authStore';
 import type { AppUser } from '../../store/authStore';
 
 // Super Admin credentials (hardcoded for demo / localStorage simulation)
-const SUPER_ADMIN_EMAIL = 'superadmin@postscout.com';
+const SUPER_ADMIN_EMAIL = 'superadmin@thebatstore.com';
 const SUPER_ADMIN_PASSWORD = 'SuperAdmin@123';
 
 const SuperAdminLogin: React.FC = () => {
@@ -93,7 +93,7 @@ const SuperAdminLogin: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="superadmin@postscout.com"
+                  placeholder="superadmin@thebatstore.com"
                   required
                   className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-sapphire focus:ring-1 focus:ring-sapphire transition-all"
                 />
@@ -136,7 +136,7 @@ const SuperAdminLogin: React.FC = () => {
 
           <div className="mt-6 p-4 bg-sapphire/10 border border-sapphire/20 rounded-xl">
             <p className="text-xs text-gray-400 text-center font-medium">🔐 Demo Credentials</p>
-            <p className="text-xs text-gray-300 text-center mt-1">superadmin@postscout.com / SuperAdmin@123</p>
+            <p className="text-xs text-gray-300 text-center mt-1">superadmin@thebatstore.com / SuperAdmin@123</p>
           </div>
         </div>
       </div>

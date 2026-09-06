@@ -25,7 +25,7 @@ interface CustomerStore {
 const initialCustomers: Customer[] = [
   { id: 'USR-1', name: 'John Doe', email: 'john@example.com', orders: 12, totalSpent: 1250.00, status: 'Active', role: 'CUSTOMER', joined: 'Jan 12, 2026' },
   { id: 'USR-2', name: 'Sarah Smith', email: 'sarah.s@example.com', orders: 3, totalSpent: 340.50, status: 'Active', role: 'CUSTOMER', joined: 'Mar 05, 2026' },
-  { id: 'USR-3', name: 'Admin User', email: 'admin@postscout.com', orders: 0, totalSpent: 0, status: 'Active', role: 'ADMIN', joined: 'Dec 01, 2025' },
+  { id: 'USR-3', name: 'Admin User', email: 'admin@thebatstore.com', orders: 0, totalSpent: 0, status: 'Active', role: 'ADMIN', joined: 'Dec 01, 2025' },
   { id: 'USR-4', name: 'Mike Johnson', email: 'mikej@example.com', orders: 1, totalSpent: 89.99, status: 'Inactive', role: 'CUSTOMER', joined: 'Jun 22, 2026' },
 ];
 
@@ -94,12 +94,12 @@ export const useCustomerStore = create<CustomerStore>()(
           let modified = false;
 
           // Always ensure superadmin is in the list
-          const hasSuperAdmin = updatedCustomers.some((c) => c.email.toLowerCase() === 'superadmin@postscout.com');
+          const hasSuperAdmin = updatedCustomers.some((c) => c.email.toLowerCase() === 'superadmin@thebatstore.com');
           if (!hasSuperAdmin) {
             updatedCustomers.push({
               id: 'superadmin-001',
               name: 'Super Admin',
-              email: 'superadmin@postscout.com',
+              email: 'superadmin@thebatstore.com',
               orders: 0,
               totalSpent: 0,
               status: 'Active',
@@ -140,6 +140,6 @@ export const useCustomerStore = create<CustomerStore>()(
           return modified ? { customers: updatedCustomers } : {};
         }),
     }),
-    { name: 'postscout-customers-storage' }
+    { name: 'thebatstore-customers-storage' }
   )
 );

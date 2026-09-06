@@ -279,6 +279,6 @@ export const useProductStore = create<ProductStore>()(
           }),
         })),
     }),
-    { name: 'postscout-products-storage-v15' }
+    { name: 'thebatstore-products-storage-v15' }
   )
 );

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Star, Clock, Heart, Zap, Search, ShoppingCart, Check, ArrowLeft, Watch, Headphones, Smartphone, Flame, Package } from 'lucide-react';
+import { Star, Clock, Heart, Zap, Search, ShoppingCart, Check, ArrowLeft, Watch, Headphones, Smartphone, Flame, Package, Activity, Sparkles, Gamepad2, Car, Book, Gift } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { SEO } from '../components/SEO';
 
-const CATEGORIES = ['All Deals', 'Electronics', 'Fashion', 'Furniture', 'Photography', 'Home & Kitchen'];
+const CATEGORIES = ['All Deals', 'Electronics', 'Fashion', 'Furniture', 'Photography', 'Home & Kitchen', 'Sports', 'Beauty', 'Gaming', 'Automotive', 'Books', 'Gifts'];
 
 const flashSaleProducts = [
   { id: 101, name: 'Noise-Cancelling Headphones Pro', category: 'Electronics', price: 199.99, oldPrice: 349.99, rating: 4.8, reviews: 320, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', discount: 43 },
@@ -25,6 +25,12 @@ const flashSaleProducts = [
   { id: 114, name: 'Minimalist Ceramic Coffee Mug Set', category: 'Home & Kitchen', price: 19.99, oldPrice: 45.00, rating: 4.5, reviews: 540, image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500&q=80', discount: 55 },
   { id: 115, name: 'Professional DSLR Camera Body', category: 'Photography', price: 899.00, oldPrice: 1299.00, rating: 4.9, reviews: 124, image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&q=80', discount: 30 },
   { id: 116, name: 'Curved Ultra-Wide Monitor', category: 'Electronics', price: 399.00, oldPrice: 699.00, rating: 4.7, reviews: 856, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80', discount: 42 },
+  { id: 117, name: 'Adjustable Dumbbell Set', category: 'Sports', price: 199.00, oldPrice: 299.00, rating: 4.8, reviews: 450, image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80', discount: 33 },
+  { id: 118, name: 'Luxury Skincare Gift Set', category: 'Beauty', price: 89.00, oldPrice: 149.00, rating: 4.9, reviews: 672, image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&q=80', discount: 40 },
+  { id: 119, name: 'Next-Gen VR Headset', category: 'Gaming', price: 299.00, oldPrice: 499.00, rating: 4.6, reviews: 890, image: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=500&q=80', discount: 40 },
+  { id: 120, name: 'Premium Car Wax Kit', category: 'Automotive', price: 34.99, oldPrice: 59.99, rating: 4.7, reviews: 320, image: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=500&q=80', discount: 41 },
+  { id: 121, name: 'Bestselling Sci-Fi Novel Set', category: 'Books', price: 45.00, oldPrice: 75.00, rating: 4.9, reviews: 1250, image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80', discount: 40 },
+  { id: 122, name: 'Artisan Chocolate Box', category: 'Gifts', price: 29.99, oldPrice: 49.99, rating: 4.8, reviews: 560, image: 'https://images.unsplash.com/photo-1548883354-94cb221a6a02?w=500&q=80', discount: 40 },
 ];
 
 const Sale: React.FC = () => {
@@ -95,6 +101,12 @@ const Sale: React.FC = () => {
     'Furniture': Package,
     'Photography': Headphones,
     'Home & Kitchen': Flame,
+    'Sports': Activity,
+    'Beauty': Sparkles,
+    'Gaming': Gamepad2,
+    'Automotive': Car,
+    'Books': Book,
+    'Gifts': Gift,
   };
 
   return (

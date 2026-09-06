@@ -47,6 +47,6 @@ export const useBannerStore = create<BannerStore>()(
           banners: newBanners.map((b, idx) => ({ ...b, order: idx + 1 })),
         })),
     }),
-    { name: 'postscout-banners-storage' }
+    { name: 'thebatstore-banners-storage' }
   )
 );

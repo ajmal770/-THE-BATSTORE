@@ -180,7 +180,7 @@ const Customers: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `postscout_customers_${Date.now()}.csv`);
+    link.setAttribute("download", `thebatstore_customers_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();

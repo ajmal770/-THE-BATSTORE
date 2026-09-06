@@ -78,7 +78,7 @@ const AdminManager: React.FC = () => {
         </div>
         <div>
           <p className="font-bold text-yellow-900">Super Admin</p>
-          <p className="text-sm text-yellow-700 mt-0.5">superadmin@postscout.com</p>
+          <p className="text-sm text-yellow-700 mt-0.5">superadmin@thebatstore.com</p>
           <span className="inline-block mt-1 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full font-semibold">Hardcoded · Cannot be deleted</span>
         </div>
       </div>

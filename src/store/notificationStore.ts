@@ -133,6 +133,6 @@ export const useNotificationStore = create<NotificationStore>()(
         return get().notifications.filter((n) => !n.isRead).length;
       },
     }),
-    { name: 'postscout-notifications' }
+    { name: 'thebatstore-notifications' }
   )
 );

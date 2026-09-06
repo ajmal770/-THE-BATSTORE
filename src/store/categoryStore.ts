@@ -72,6 +72,6 @@ export const useCategoryStore = create<CategoryStore>()(
           categories: state.categories.filter((c) => c.id !== id),
         })),
     }),
-    { name: 'postscout-categories-storage-v3' }
+    { name: 'thebatstore-categories-storage-v3' }
   )
 );

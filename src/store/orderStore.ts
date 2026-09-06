@@ -129,6 +129,6 @@ export const useOrderStore = create<OrderStore>()(
           orders: state.orders.filter((o) => o.id !== id),
         })),
     }),
-    { name: 'postscout-orders-storage' }
+    { name: 'thebatstore-orders-storage' }
   )
 );

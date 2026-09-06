@@ -152,7 +152,7 @@ export default function Help() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-5"
           >
             <HelpCircle size={14} />
-            <span>PostScout Support Centre</span>
+            <span>The BatStore Support Centre</span>
           </motion.div>
 
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
@@ -252,7 +252,7 @@ export default function Help() {
                  <div className="flex-1">
                    <h4 className="text-base font-bold text-slate-900">256-Bit SSL Enterprise Protection</h4>
                    <p className="text-[13px] text-slate-600 leading-relaxed mt-1 mb-5 max-w-2xl">
-                     All credit card information is encrypted at rest and in transit. PostScout conforms to strict PCI-DSS Level 1 compliance standards so your personal financial details remain 100% safe.
+                     All credit card information is encrypted at rest and in transit. The BatStore conforms to strict PCI-DSS Level 1 compliance standards so your personal financial details remain 100% safe.
                    </p>
                    
                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -490,7 +490,7 @@ export default function Help() {
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed mb-6">
-              PostScout respects intellectual property rights. If you believe your trademark, copyright, or brand asset is being infringed by any product listed on PostScout, please submit a formal report below.
+              The BatStore respects intellectual property rights. If you believe your trademark, copyright, or brand asset is being infringed by any product listed on The BatStore, please submit a formal report below.
             </p>
 
             <AnimatePresence>
@@ -572,7 +572,7 @@ export default function Help() {
                       required
                       value={infringementForm.productUrl}
                       onChange={(e) => setInfringementForm({ ...infringementForm, productUrl: e.target.value })}
-                      placeholder="https://postscout.com/products/123"
+                      placeholder="https://thebatstore.com/products/123"
                       className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-xs focus:outline-none focus:border-red-500"
                     />
                   </div>
@@ -700,7 +700,7 @@ export default function Help() {
                   <div>
                     <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest mb-3 text-indigo-600">2. How We Use Information</h4>
                     <p className="text-slate-600 text-sm leading-loose">
-                      We use the information we collect to provide, maintain, and improve our services. This includes using the information to process payments, provide customer support, send updates and administrative messages, and communicate with you about products, services, offers, and events offered by PostScout.
+                      We use the information we collect to provide, maintain, and improve our services. This includes using the information to process payments, provide customer support, send updates and administrative messages, and communicate with you about products, services, offers, and events offered by The BatStore.
                     </p>
                   </div>
                   
@@ -773,7 +773,7 @@ export default function Help() {
                 </div>
                 <h4 className="text-lg font-bold text-slate-900 mb-2">Verified Sustainable Enterprise</h4>
                 <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto mb-6">
-                  PostScout is officially certified for Extended Producer Responsibility (EPR), guaranteeing that our packaging and electronics waste are responsibly recycled in accordance with local and international environmental laws.
+                  The BatStore is officially certified for Extended Producer Responsibility (EPR), guaranteeing that our packaging and electronics waste are responsibly recycled in accordance with local and international environmental laws.
                 </p>
                 <div className="bg-white border border-slate-200 rounded-xl p-4 w-full max-w-md flex justify-between items-center text-left">
                   <div>

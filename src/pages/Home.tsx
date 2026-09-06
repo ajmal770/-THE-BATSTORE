@@ -1306,7 +1306,7 @@ const Home: React.FC = () => {
               <img
                 src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?q=80&w=800"
                 alt="App preview"
-                className="rounded-2xl shadow-2xl border-4 border-white/20 transform md:rotate-2 hover:rotate-0 transition-transform duration-500 w-full aspect-video object-cover"
+                className="rounded-2xl shadow-2xl border-4 border-white/20 w-full aspect-video object-cover"
               />
             </div>
           </div>

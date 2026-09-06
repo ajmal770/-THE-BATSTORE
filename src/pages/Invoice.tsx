@@ -140,10 +140,10 @@ const Invoice: React.FC = () => {
                   <div className="w-12 h-12 bg-[#0B409C] rounded-lg flex items-center justify-center text-white">
                     <Package size={26} className="stroke-[2.5]" />
                   </div>
-                  <span className="text-3xl font-black tracking-tight text-[#0B409C]">POSTSCOUT</span>
+                  <span className="text-3xl font-black tracking-tight text-[#0B409C] flex items-center gap-2">THE <img src="/logo.svg" alt="Bat Logo" className="h-6 w-auto object-contain" /> STORE</span>
                 </div>
                 
-                <h2 className="text-[#0B409C] font-bold text-base mb-3">PostScout Inc.</h2>
+                <h2 className="text-[#0B409C] font-bold text-base mb-3">The BatStore Inc.</h2>
                 
                 <div className="space-y-2 text-gray-600 text-[13px]">
                   <div className="flex items-start gap-2">
@@ -159,11 +159,11 @@ const Invoice: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail size={15} className="text-gray-400" />
-                    <p>support@postscout.com</p>
+                    <p>support@thebatstore.com</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Globe size={15} className="text-gray-400" />
-                    <p>www.postscout.com</p>
+                    <p>www.thebatstore.com</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <FileText size={15} className="text-gray-400" />
@@ -439,7 +439,7 @@ const Invoice: React.FC = () => {
                   <FileText size={16} />
                   <span className="font-bold uppercase tracking-wider text-[11px]">Customer Notes</span>
                 </div>
-                <p className="text-[11px] text-gray-700 mb-2 leading-relaxed font-medium">Thank you for shopping with PostScout.</p>
+                <p className="text-[11px] text-gray-700 mb-2 leading-relaxed font-medium">Thank you for shopping with The BatStore.</p>
                 <p className="text-[11px] text-gray-700 mb-2 leading-relaxed">For returns, exchanges, or warranty claims, please contact us within 30 days of delivery.</p>
                 <p className="text-[11px] text-gray-700 leading-relaxed font-medium">We appreciate your business!</p>
               </div>
@@ -496,7 +496,7 @@ const Invoice: React.FC = () => {
                 </div>
                 <div className="border-t border-gray-400 pt-2">
                   <p className="text-[11px] font-bold text-gray-900">Authorized Signature</p>
-                  <p className="text-[10px] text-gray-500">PostScout Inc.</p>
+                  <p className="text-[10px] text-gray-500">The BatStore Inc.</p>
                 </div>
               </div>
             </div>
@@ -506,7 +506,7 @@ const Invoice: React.FC = () => {
           {/* Footer Area */}
           <div className="mt-auto">
             <div className="text-center mb-6 pt-2">
-              <h3 className="text-[#0B409C] font-black text-lg mb-4">Thank you for choosing PostScout!</h3>
+              <h3 className="text-[#0B409C] font-black text-lg mb-4">Thank you for choosing The BatStore!</h3>
               
               <div className="flex items-center justify-center gap-8 text-[11px] text-gray-600 mb-8">
                 <div className="flex items-center gap-2">
@@ -515,11 +515,11 @@ const Invoice: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={14} className="text-[#0B409C]" />
-                  <span>support@postscout.com</span>
+                  <span>support@thebatstore.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Globe size={14} className="text-[#0B409C]" />
-                  <span>www.postscout.com</span>
+                  <span>www.thebatstore.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin size={14} className="text-[#0B409C]" />
@@ -563,7 +563,7 @@ const Invoice: React.FC = () => {
             </div>
             
             <div className="bg-[#0B409C] text-white py-3 px-10 flex justify-between items-center text-[11px]">
-              <p>© 2026 PostScout Inc. All rights reserved.</p>
+              <p>© 2026 The BatStore Inc. All rights reserved.</p>
               <p>Page 1 of 1</p>
             </div>
           </div>

@@ -53,6 +53,6 @@ export const useCouponStore = create<CouponStore>()(
           ),
         })),
     }),
-    { name: 'postscout-coupons-storage' }
+    { name: 'thebatstore-coupons-storage' }
   )
 );

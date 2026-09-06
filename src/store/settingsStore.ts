@@ -45,6 +45,6 @@ export const useSettingsStore = create<SettingsStore>()(
           settings: { ...state.settings, ...updates },
         })),
     }),
-    { name: 'postscout-settings-storage' }
+    { name: 'thebatstore-settings-storage' }
   )
 );

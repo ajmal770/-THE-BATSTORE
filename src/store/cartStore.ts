@@ -66,7 +66,7 @@ export const useCartStore = create<CartState>()(
       applyCoupon: (coupon) => set({ appliedCoupon: coupon }),
     }),
     {
-      name: 'postscout-cart-storage', // saves to localStorage automatically
+      name: 'thebatstore-cart-storage', // saves to localStorage automatically
     }
   )
 );

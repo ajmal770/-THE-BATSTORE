@@ -43,7 +43,7 @@ export const useWishlistStore = create<WishlistState>()(
       clearWishlist: () => set({ items: [] }),
     }),
     {
-      name: 'postscout-wishlist-storage', // saves to localStorage automatically
+      name: 'thebatstore-wishlist-storage', // saves to localStorage automatically
     }
   )
 );

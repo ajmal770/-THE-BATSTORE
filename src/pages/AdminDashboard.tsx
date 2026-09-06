@@ -119,7 +119,7 @@ const AdminDashboard: React.FC = () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `postscout_report_${Date.now()}.${exportFormat.toLowerCase()}`);
+            downloadAnchor.setAttribute("download", `thebatstore_report_${Date.now()}.${exportFormat.toLowerCase()}`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();

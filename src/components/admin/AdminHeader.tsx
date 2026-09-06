@@ -33,7 +33,7 @@ export const AdminHeader: React.FC = () => {
 
   const [readNotifications, setReadNotifications] = useState<string[]>(() => {
     try {
-      const stored = localStorage.getItem('postscout-read-notifications');
+      const stored = localStorage.getItem('thebatstore-read-notifications');
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -42,7 +42,7 @@ export const AdminHeader: React.FC = () => {
 
   const [clearedNotifications, setClearedNotifications] = useState<string[]>(() => {
     try {
-      const stored = localStorage.getItem('postscout-cleared-notifications');
+      const stored = localStorage.getItem('thebatstore-cleared-notifications');
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -144,7 +144,7 @@ export const AdminHeader: React.FC = () => {
     if (!readNotifications.includes(id)) {
       const updated = [...readNotifications, id];
       setReadNotifications(updated);
-      localStorage.setItem('postscout-read-notifications', JSON.stringify(updated));
+      localStorage.setItem('thebatstore-read-notifications', JSON.stringify(updated));
     }
   };
 
@@ -152,14 +152,14 @@ export const AdminHeader: React.FC = () => {
     const allIds = notifications.map(n => n.id);
     const updated = Array.from(new Set([...readNotifications, ...allIds]));
     setReadNotifications(updated);
-    localStorage.setItem('postscout-read-notifications', JSON.stringify(updated));
+    localStorage.setItem('thebatstore-read-notifications', JSON.stringify(updated));
   };
 
   const handleClearAll = () => {
     const allIds = notifications.map(n => n.id);
     const updated = Array.from(new Set([...clearedNotifications, ...allIds]));
     setClearedNotifications(updated);
-    localStorage.setItem('postscout-cleared-notifications', JSON.stringify(updated));
+    localStorage.setItem('thebatstore-cleared-notifications', JSON.stringify(updated));
   };
 
   const unreadCount = notifications.filter(n => n.unread).length;

@@ -37,8 +37,7 @@ export const AdminSidebar: React.FC = () => {
     <aside className="w-64 bg-deep-navy min-h-screen text-white flex flex-col hidden md:flex">
       <div className="p-6 border-b border-white/10">
         <h2 className="text-xl font-bold text-white tracking-wider flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-8 w-auto filter brightness-0 invert" />
-          THE BATSTORE
+          <span className="flex items-center gap-1 uppercase tracking-tighter">THE <img src="/logo.svg" alt="Bat Logo" className="h-4 w-auto object-contain brightness-0 invert" /> STORE</span>
         </h2>
         <div className="mt-3 flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isSuperAdmin ? 'bg-yellow-400' : 'bg-green-400'}`} />
@@ -98,7 +97,7 @@ export const AdminSidebar: React.FC = () => {
         >
           <LogOut size={18} /> Sign Out
         </button>
-        <p className="text-xs text-gray-600 text-center mt-3">© 2026 The BatStore</p>
+        <p className="text-xs text-gray-600 text-center mt-3 flex items-center justify-center gap-1">© 2026 THE <img src="/logo.svg" alt="Bat Logo" className="h-3 w-auto object-contain brightness-0 invert opacity-50" /> STORE</p>
       </div>
     </aside>
   );

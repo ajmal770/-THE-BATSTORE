@@ -57,7 +57,7 @@ interface AuthState {
 const defaultRegisteredUsers: RegisteredUser[] = [
   { uid: 'USR-1', email: 'john@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'John Doe' },
   { uid: 'USR-2', email: 'sarah.s@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Sarah Smith' },
-  { uid: 'USR-3', email: 'admin@postscout.com', password: 'Admin@123', role: 'ADMIN', displayName: 'Admin User' },
+  { uid: 'USR-3', email: 'admin@thebatstore.com', password: 'Admin@123', role: 'ADMIN', displayName: 'Admin User' },
   { uid: 'USR-4', email: 'mikej@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Mike Johnson' },
 ];
 
@@ -83,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
         // Check if email already exists in registeredUsers or adminAccounts
         const emailExists = state.registeredUsers.some((u) => u.email.toLowerCase() === emailLower) ||
                             state.adminAccounts.some((a) => a.email.toLowerCase() === emailLower) ||
-                            emailLower === 'superadmin@postscout.com';
+                            emailLower === 'superadmin@thebatstore.com';
                             
         if (emailExists) {
           return { success: false, error: 'Email address is already in use by another account.' };
@@ -115,7 +115,7 @@ export const useAuthStore = create<AuthState>()(
         })),
     }),
     { 
-      name: 'postscout-auth-storage', 
+      name: 'thebatstore-auth-storage', 
       partialize: (state) => ({ 
         user: state.user,
         firebaseUser: state.firebaseUser,

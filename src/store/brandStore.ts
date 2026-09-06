@@ -38,6 +38,6 @@ export const useBrandStore = create<BrandStore>()(
           brands: state.brands.filter((b) => b.id !== id),
         })),
     }),
-    { name: 'postscout-brands-storage' }
+    { name: 'thebatstore-brands-storage' }
   )
 );

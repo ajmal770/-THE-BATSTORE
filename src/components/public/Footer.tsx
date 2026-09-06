@@ -523,7 +523,7 @@ export const Footer: React.FC = () => {
 
               {/* Copyright Text */}
               <p className="text-xs text-slate-400 tracking-wide font-sans font-medium">
-                &copy; {new Date().getFullYear()} <span className="font-extrabold text-slate-200">POST<span className="text-blue-400 font-extrabold">SCOUT</span></span> Enterprise. {t('footer.rights')}
+                &copy; {new Date().getFullYear()} <span className="font-extrabold text-slate-200 inline-flex items-center gap-1 uppercase tracking-tighter mx-1">THE <img src="/logo.svg" alt="Bat Logo" className="h-4 w-auto object-contain brightness-0 invert" /> STORE</span> Enterprise. {t('footer.rights')}
               </p>
             </div>
           </div>
