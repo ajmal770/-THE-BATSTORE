@@ -77,7 +77,7 @@ const Coupons: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Coupons & Discounts</h1>
+          <h1 className="text-2xl font-medium text-gray-900">Coupons & Discounts</h1>
           <p className="text-sm text-gray-500 mt-1">Manage promotional offers, discounts, and order thresholds.</p>
         </div>
         <button 
@@ -93,7 +93,7 @@ const Coupons: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 text-xs uppercase tracking-wider font-black">
+              <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 text-xs uppercase tracking-wider font-medium">
                 <th className="px-6 py-4">Coupon Code</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Value</th>
@@ -112,7 +112,7 @@ const Coupons: React.FC = () => {
               ) : (
                 coupons.map((coupon) => (
                   <tr key={coupon.id} className="hover:bg-blue-50/30 transition-colors">
-                    <td className="px-6 py-4 font-black text-sapphire flex items-center gap-2">
+                    <td className="px-6 py-4 font-medium text-sapphire flex items-center gap-2">
                       <Tag size={15} className="text-sapphire" /> {coupon.code}
                     </td>
                     <td className="px-6 py-4 text-gray-600 font-medium">{coupon.type}</td>
@@ -126,7 +126,7 @@ const Coupons: React.FC = () => {
                     <td className="px-6 py-4">
                       <button 
                         onClick={() => handleToggleStatus(coupon)}
-                        className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider cursor-pointer transition-colors border-none ${
+                        className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider cursor-pointer transition-colors border-none ${
                           coupon.status === 'Active' 
                             ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100/60' 
                             : 'bg-rose-50 text-rose-700 hover:bg-rose-100/60'
@@ -189,10 +189,10 @@ const Coupons: React.FC = () => {
                     <Tag size={16} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-gray-900 leading-tight">
+                    <h3 className="text-base font-medium text-gray-900 leading-tight">
                       {editingCoupon ? 'Modify Coupon' : 'Create Coupon'}
                     </h3>
-                    <p className="text-[10px] text-gray-400 font-bold mt-0.5">Define codes, percentages & limitations</p>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">Define codes, percentages & limitations</p>
                   </div>
                 </div>
                 <button
@@ -214,20 +214,20 @@ const Coupons: React.FC = () => {
                     placeholder="e.g. EXTRA25" 
                     value={code} 
                     onChange={(e) => setCode(e.target.value)} 
-                    className="uppercase font-bold tracking-widest text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs" 
+                    className="uppercase font-medium tracking-widest text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs" 
                   />
                 </div>
 
                 {/* Discount Type Selector Buttons */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Discount Mode</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Discount Mode</label>
                   <div className="flex gap-2">
                     {(['Percentage', 'Fixed Amount', 'Free Shipping'] as const).map((t) => (
                       <button
                         key={t}
                         type="button"
                         onClick={() => setDiscountType(t)}
-                        className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider border rounded-xl transition-all cursor-pointer ${
+                        className={`flex-1 py-2.5 text-[10px] font-medium uppercase tracking-wider border rounded-xl transition-all cursor-pointer ${
                           discountType === t 
                             ? 'border-sapphire bg-blue-50/50 text-sapphire shadow-sm shadow-sapphire/5' 
                             : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-800'
@@ -248,7 +248,7 @@ const Coupons: React.FC = () => {
                       value={value}
                       onChange={(e) => setValue(parseFloat(e.target.value) || 0)}
                       placeholder={discountType === 'Percentage' ? '20' : '50.00'} 
-                      className="font-bold text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
+                      className="font-medium text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
                     />
                   </div>
                 )}
@@ -261,7 +261,7 @@ const Coupons: React.FC = () => {
                     value={minOrder}
                     onChange={(e) => setMinOrder(parseFloat(e.target.value) || 0)}
                     placeholder="0" 
-                    className="font-bold text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
+                    className="font-medium text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
                   />
                 </div>
                 
@@ -272,17 +272,17 @@ const Coupons: React.FC = () => {
                     type="date" 
                     value={expiry}
                     onChange={(e) => setExpiry(e.target.value)}
-                    className="font-bold text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
+                    className="font-medium text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs"
                   />
                 </div>
 
                 {/* Status Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Active Status</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Active Status</label>
                   <select 
                     value={status} 
                     onChange={(e) => setStatus(e.target.value as 'Active' | 'Expired')}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 cursor-pointer text-xs"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 cursor-pointer text-xs"
                   >
                     <option value="Active">Active</option>
                     <option value="Expired">Expired</option>
@@ -294,13 +294,13 @@ const Coupons: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={() => { setIsAddMode(false); setEditingCoupon(null); }}
-                    className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 font-black uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
+                    className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-black uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
+                    className="flex-1 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-medium uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
                   >
                     {editingCoupon ? 'Save Changes' : 'Create Coupon'}
                   </button>

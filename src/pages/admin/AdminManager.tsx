@@ -56,7 +56,7 @@ const AdminManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
             <Crown className="text-yellow-500" size={26} /> Admin Manager
           </h1>
           <p className="text-gray-500 text-sm mt-1">Create and manage admin accounts for the dashboard.</p>
@@ -77,7 +77,7 @@ const AdminManager: React.FC = () => {
           <Crown className="text-yellow-600" size={20} />
         </div>
         <div>
-          <p className="font-bold text-yellow-900">Super Admin</p>
+          <p className="font-medium text-yellow-900">Super Admin</p>
           <p className="text-sm text-yellow-700 mt-0.5">superadmin@thebatstore.com</p>
           <span className="inline-block mt-1 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full font-semibold">Hardcoded · Cannot be deleted</span>
         </div>
@@ -118,8 +118,8 @@ const AdminManager: React.FC = () => {
                     <Shield size={18} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-gray-900 leading-tight">New Admin Account</h3>
-                    <p className="text-[11px] text-gray-400 font-bold mt-0.5">Provision a new administrator profile with secure credentials</p>
+                    <h3 className="text-lg font-medium text-gray-900 leading-tight">New Admin Account</h3>
+                    <p className="text-[11px] text-gray-400 font-medium mt-0.5">Provision a new administrator profile with secure credentials</p>
                   </div>
                 </div>
                 <button
@@ -134,14 +134,14 @@ const AdminManager: React.FC = () => {
               {/* Modal Form */}
               <form onSubmit={handleCreate} className="p-8 overflow-y-auto space-y-6 bg-white text-xs">
                 {error && (
-                  <div className="bg-rose-50 border border-rose-200 text-rose-600 text-xs px-4 py-3.5 rounded-xl font-bold">
+                  <div className="bg-rose-50 border border-rose-200 text-rose-600 text-xs px-4 py-3.5 rounded-xl font-medium">
                     ⚠️ {error}
                   </div>
                 )}
 
                 {/* Display Name Input */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Display Name</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Display Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input
@@ -157,7 +157,7 @@ const AdminManager: React.FC = () => {
 
                 {/* Email Input */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Email Address</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input
@@ -173,7 +173,7 @@ const AdminManager: React.FC = () => {
 
                 {/* Password Input */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Password</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Password</label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input
@@ -199,13 +199,13 @@ const AdminManager: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={() => { setShowForm(false); setError(''); setSuccess(''); }}
-                    className="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-600 font-black uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
+                    className="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-600 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 py-3.5 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-black uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
+                    className="flex-1 py-3.5 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-medium uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
                   >
                     Create Account
                   </button>
@@ -219,7 +219,7 @@ const AdminManager: React.FC = () => {
       {/* Admin Accounts List */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="font-medium text-gray-900 flex items-center gap-2">
             <Users size={18} className="text-sapphire" /> Admin Accounts
           </h2>
           <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">
@@ -238,7 +238,7 @@ const AdminManager: React.FC = () => {
             {adminAccounts.map((admin) => (
               <div key={admin.uid} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-sapphire/10 rounded-full flex items-center justify-center font-bold text-sapphire text-lg">
+                  <div className="w-10 h-10 bg-sapphire/10 rounded-full flex items-center justify-center font-medium text-sapphire text-lg">
                     {admin.displayName.charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -248,7 +248,7 @@ const AdminManager: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right hidden sm:block">
-                    <span className="text-xs bg-blue-50 text-sapphire px-2 py-0.5 rounded-full font-bold uppercase">Admin</span>
+                    <span className="text-xs bg-blue-50 text-sapphire px-2 py-0.5 rounded-full font-medium uppercase">Admin</span>
                     <p className="text-xs text-gray-400 mt-1 flex items-center gap-1 justify-end">
                       <Calendar size={11} /> {new Date(admin.createdAt).toLocaleDateString()}
                     </p>

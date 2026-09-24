@@ -77,7 +77,7 @@ const Banners: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
             <ImageIcon className="text-sapphire" /> Banner Management
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage homepage carousel banners, order slides, and promotional graphics</p>
@@ -94,7 +94,7 @@ const Banners: React.FC = () => {
         
         {/* Banner List */}
         <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 ${isAddMode ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Active Homepage Banners</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-6">Active Homepage Banners</h2>
           
           {sortedBanners.length === 0 ? (
             <div className="text-center py-12 text-gray-400">No banners found. Click 'Add New Banner' to create one.</div>
@@ -125,7 +125,7 @@ const Banners: React.FC = () => {
                   
                   <div className="flex-1 w-full">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-lg text-gray-900">{banner.title}</h3>
+                      <h3 className="font-medium text-lg text-gray-900">{banner.title}</h3>
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                         banner.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                       }`}>
@@ -160,7 +160,7 @@ const Banners: React.FC = () => {
         {isAddMode && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit sticky top-24">
             <div className="p-6 border-b bg-gray-50 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">{editingBanner ? 'Edit Banner' : 'Add New Banner'}</h2>
+              <h2 className="text-lg font-medium text-gray-900">{editingBanner ? 'Edit Banner' : 'Add New Banner'}</h2>
               <button onClick={() => { setIsAddMode(false); setEditingBanner(null); }} className="text-gray-400 hover:text-gray-700 cursor-pointer">
                 <X size={20} />
               </button>

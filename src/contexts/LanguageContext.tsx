@@ -169,7 +169,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     Portuguese: 'Frete Grátis'
   },
   'feature.shipping.desc': {
-    English: 'On all orders over $150.',
+    English: 'On all orders over 15 Klm & $ 99.9',
     Spanish: 'En pedidos superiores a $150.',
     French: 'Sur toutes las commandes de plus de $150.',
     German: 'Für alle Bestellungen über $150.',

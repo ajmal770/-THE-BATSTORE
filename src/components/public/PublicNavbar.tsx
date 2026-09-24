@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, Menu, Package, Heart, X, ChevronDown, ChevronRight, Home as HomeIcon, ShoppingBag, Tag, LogOut, Bell, Trash2, CheckCheck, LayoutGrid, Settings, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, Package, Heart, X, ChevronDown, ChevronRight, Home as HomeIcon, ShoppingBag, Tag, LogOut, Bell, Trash2, CheckCheck, LayoutGrid, Settings, ShieldCheck, ArrowRight, Zap, Laptop, Watch, Armchair, Camera, Headphones, Shirt, Gamepad2, Dumbbell, Flower2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../store/authStore';
 import { useCartStore } from '../../store/cartStore';
@@ -17,6 +17,22 @@ const CategoriesDropdown: React.FC<{ isOpen: boolean, onClose: () => void, categ
   const navigate = useNavigate();
   const topCategories = categories.filter(c => c.parent === '-');
 
+  const getCategoryIcon = (name: string) => {
+    switch(name.toLowerCase()) {
+      case 'electronics': return { icon: <Laptop size={18} />, bg: 'bg-blue-100', color: 'text-blue-600' };
+      case 'smart watches': return { icon: <Watch size={18} />, bg: 'bg-orange-100', color: 'text-orange-600' };
+      case 'furniture': return { icon: <Armchair size={18} />, bg: 'bg-teal-100', color: 'text-teal-600' };
+      case 'photography': return { icon: <Camera size={18} />, bg: 'bg-purple-100', color: 'text-purple-600' };
+      case 'audio': return { icon: <Headphones size={18} />, bg: 'bg-red-100', color: 'text-red-600' };
+      case 'fashion': return { icon: <Shirt size={18} />, bg: 'bg-blue-100', color: 'text-blue-600' };
+      case 'home & kitchen': return { icon: <HomeIcon size={18} />, bg: 'bg-emerald-100', color: 'text-emerald-600' };
+      case 'gaming': return { icon: <Gamepad2 size={18} />, bg: 'bg-purple-100', color: 'text-purple-600' };
+      case 'sports & fitness': return { icon: <Dumbbell size={18} />, bg: 'bg-indigo-100', color: 'text-indigo-600' };
+      case 'beauty': return { icon: <Flower2 size={18} />, bg: 'bg-pink-100', color: 'text-pink-600' };
+      default: return { icon: <Package size={18} />, bg: 'bg-gray-100', color: 'text-gray-600' };
+    }
+  };
+
   const handleCategoryClick = (name: string) => {
     onClose();
     navigate(`/products?category=${encodeURIComponent(name)}`);
@@ -30,69 +46,63 @@ const CategoriesDropdown: React.FC<{ isOpen: boolean, onClose: () => void, categ
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 15, scale: 0.98 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[720px] bg-white rounded-3xl shadow-2xl shadow-gray-200/80 border border-gray-100 p-6 z-50 grid grid-cols-5 gap-6"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[960px] bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 p-4 z-50"
         >
-          {/* Categories Grid (Col Span 3) */}
-          <div className="col-span-3 space-y-4">
-            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
+            <div className="text-blue-600">
+              <LayoutGrid size={18} className="stroke-[2.5]" />
+            </div>
+            <h3 className="text-xs font-black text-[#0b1b3d] uppercase tracking-widest">
               Departments
             </h3>
-            <div className="grid grid-cols-3 gap-x-4 gap-y-6">
-              {topCategories.map((cat) => {
-                const subCats = categories.filter(sub => sub.parent === cat.name);
-                return (
-                  <div key={cat.id} className="space-y-1">
-                    <button
-                      onClick={() => handleCategoryClick(cat.name)}
-                      className="font-bold text-gray-900 hover:text-sapphire transition-colors text-sm text-left flex items-center gap-1 group cursor-pointer"
-                    >
-                      {cat.name}
-                      <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-sapphire" />
-                    </button>
-                    {subCats.length > 0 && (
-                      <div className="flex flex-col gap-1 pl-2">
-                        {subCats.map((sub) => (
-                          <button
-                            key={sub.id}
-                            onClick={() => handleCategoryClick(sub.name)}
-                            className="text-xs text-gray-500 hover:text-sapphire text-left transition-colors font-medium cursor-pointer"
-                          >
-                            {sub.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
-          {/* Featured Promo Banner with image (Col Span 2) */}
-          <div className="col-span-2 relative rounded-2xl overflow-hidden shadow-lg shadow-sapphire/15 flex flex-col justify-between p-5 text-white min-h-[260px] group/banner">
-            {/* Background Image with Zoom on Hover */}
-            <img
-              src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80"
-              alt="Summer Essentials"
-              className="absolute inset-0 w-full h-full object-cover group-hover/banner:scale-105 transition-transform duration-500"
-            />
-            {/* Gradient Overlay for Text Visibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/65 to-transparent"></div>
-
-            <div className="relative z-10">
-              <span className="bg-sapphire text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider inline-block mb-2 shadow-sm">
-                Limited Time
-              </span>
-              <h4 className="text-base font-black leading-tight mb-1 drop-shadow-sm">Summer Essentials Up to 40% Off</h4>
-              <p className="text-gray-200 text-[10px] leading-relaxed drop-shadow-sm font-medium">Upgrade your gear with our curated list.</p>
-            </div>
-
-            <button
-              onClick={() => { onClose(); navigate('/sale'); }}
-              className="relative z-10 mt-4 w-full bg-white text-gray-900 py-2 rounded-xl font-bold text-xs hover:bg-gray-100 transition-colors shadow-sm flex items-center justify-center gap-1 cursor-pointer"
-            >
-              Shop the Sale <ChevronRight size={14} />
-            </button>
+          {/* Categories Masonry Grid */}
+          <div className="columns-3 gap-x-3">
+            {topCategories.map((cat) => {
+              const subCats = categories.filter(sub => sub.parent === cat.name);
+              const { icon, bg, color } = getCategoryIcon(cat.name);
+              
+              return (
+                <div 
+                  key={cat.id} 
+                  className="bg-white border border-gray-100 rounded-lg p-2 cursor-pointer hover:border-sapphire/40 transition-all group break-inside-avoid mb-2.5"
+                  onClick={() => handleCategoryClick(cat.name)}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${bg} ${color}`}>
+                      {icon}
+                    </div>
+                    <div className="flex-1 min-w-0 pt-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="font-bold text-gray-900 text-[13px] group-hover:text-sapphire transition-colors truncate pr-2 leading-tight">
+                          {cat.name}
+                        </span>
+                        <ChevronRight size={12} className="text-gray-300 group-hover:text-sapphire transition-colors shrink-0" />
+                      </div>
+                      
+                      {subCats.length > 0 && (
+                        <div className="hidden group-hover:flex flex-col gap-0.5 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                          {subCats.map((sub) => (
+                            <button
+                              key={sub.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCategoryClick(sub.name);
+                              }}
+                              className="text-[11px] leading-tight text-gray-500 hover:text-sapphire text-left transition-colors font-medium truncate cursor-pointer py-0.5"
+                            >
+                              {sub.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       )}
@@ -685,8 +695,18 @@ export const PublicNavbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
 
   const notifRef = useRef<HTMLDivElement>(null);
-
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Auto-open login popup after 1 second if not logged in
+  useEffect(() => {
+    let timer: number;
+    if (!user) {
+      timer = window.setTimeout(() => {
+        setIsUserMenuOpen(true);
+      }, 1000);
+    }
+    return () => window.clearTimeout(timer);
+  }, [user]);
 
   // Monitor scroll for glassmorphism layout shifts
   useEffect(() => {
@@ -725,8 +745,16 @@ export const PublicNavbar: React.FC = () => {
   return (
     <>
       {/* Top utility bar */}
-      <div className={`bg-deep-navy text-white text-[11px] py-2.5 px-4 text-center font-bold tracking-wider uppercase ${isHiddenMobileTopNav ? 'hidden md:block' : ''}`}>
-        {t('feature.shipping.title')} • {t('feature.shipping.desc')}
+      <div className={`bg-deep-navy text-white text-[11px] py-0.5 px-4 text-center font-medium tracking-wider uppercase flex items-center justify-center ${isHiddenMobileTopNav ? 'hidden md:flex' : ''}`}>
+        {t('feature.shipping.title')} • {t('feature.shipping.desc').includes('15 Klm & $ 99.9') ? (
+          <>
+            {t('feature.shipping.desc').split('15 Klm & $ 99.9')[0]}
+            <span className="font-mono text-red-400 font-bold text-[13px] normal-case tracking-widest px-1">15 Klm & $ 99.9</span>
+            {t('feature.shipping.desc').split('15 Klm & $ 99.9')[1]}
+          </>
+        ) : (
+          t('feature.shipping.desc')
+        )}
       </div>
 
       <nav className={`sticky top-0 z-50 bg-white transition-all duration-200 ${scrolled ? 'border-b border-gray-200 shadow-md shadow-gray-900/5' : 'border-b border-gray-100'} ${isHiddenMobileTopNav ? 'hidden md:block' : ''}`}>
@@ -850,7 +878,7 @@ export const PublicNavbar: React.FC = () => {
 
               {user ? (
                 <>
-                  <div className="relative hidden md:flex items-center justify-center" ref={userMenuRef}>
+                  <div className="relative hidden md:flex items-center justify-center z-[100]" ref={userMenuRef}>
                     <button
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className="relative flex items-center justify-center p-1 text-gray-700 hover:bg-gray-100/80 rounded-xl transition-all border border-transparent cursor-pointer outline-none group"
@@ -876,8 +904,12 @@ export const PublicNavbar: React.FC = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.96 }}
                           transition={{ duration: 0.15, ease: 'easeOut' }}
-                          className="absolute left-1/2 -translate-x-1/2 top-full mt-2.5 w-60 bg-white rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18)] border border-gray-200/90 p-1.5 z-[100]"
+                          className="absolute right-[-12px] origin-top-right top-full mt-3 w-60 bg-white rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18)] border border-gray-100 p-1.5 z-[100]"
                         >
+                          {/* Pointer Arrow */}
+                          <div className="absolute -top-1.5 right-[24px] w-3 h-3 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-sm z-[-1]"></div>
+                          
+                          <div className="relative z-10 bg-white rounded-xl">
                           {/* Classic & Elegant Executive Header */}
                           <div className="flex items-center gap-3 p-2.5 mb-1 bg-gray-50/70 rounded-xl border border-gray-100">
                             <div className="relative shrink-0">
@@ -992,6 +1024,7 @@ export const PublicNavbar: React.FC = () => {
                               <span>Sign Out</span>
                             </button>
                           </div>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -999,13 +1032,55 @@ export const PublicNavbar: React.FC = () => {
 
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="hidden md:flex items-center justify-center p-2 text-gray-600 hover:text-sapphire hover:bg-gray-50 rounded-xl transition-all"
-                  title="Sign In"
-                >
-                  <User size={20} />
-                </Link>
+                <div className="relative hidden md:flex items-center justify-center z-[100]" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="relative flex items-center justify-center p-2 text-gray-600 hover:text-sapphire hover:bg-gray-50 rounded-xl transition-all cursor-pointer outline-none"
+                    title="Sign In"
+                  >
+                    <User size={20} />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border border-white rounded-full animate-pulse"></span>
+                  </button>
+
+                  <AnimatePresence>
+                    {isUserMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        className="absolute right-[-12px] origin-top-right top-full mt-3 w-48 bg-white rounded-xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18)] border border-gray-100 p-3 z-[100]"
+                      >
+                        {/* Pointer Arrow */}
+                        <div className="absolute -top-1.5 right-[24px] w-3 h-3 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-sm"></div>
+
+                        <div className="relative z-10">
+                          <div className="text-center mb-3">
+                            <h3 className="font-bold text-gray-900 text-xs mb-0.5">Welcome!</h3>
+                            <p className="text-[10px] text-gray-500 leading-tight">Sign in to access your orders and wishlist.</p>
+                          </div>
+                          <Link
+                            to="/login"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="w-full bg-sapphire text-white py-1.5 rounded-lg font-bold hover:bg-deep-navy transition-colors flex items-center justify-center shadow-sm mb-2 text-xs"
+                          >
+                            Sign In
+                          </Link>
+                          <div className="text-center border-t border-gray-100 pt-2">
+                            <span className="text-[10px] text-gray-500">New? </span>
+                            <Link 
+                              to="/register" 
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="text-[10px] font-bold text-sapphire hover:underline cursor-pointer"
+                            >
+                              Register here
+                            </Link>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
 
               {/* Notification Bell */}

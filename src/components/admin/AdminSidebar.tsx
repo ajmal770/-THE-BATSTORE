@@ -34,9 +34,9 @@ export const AdminSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-deep-navy min-h-screen text-white flex flex-col hidden md:flex">
-      <div className="p-6 border-b border-white/10">
-        <h2 className="text-xl font-bold text-white tracking-wider flex items-center gap-2">
+    <aside className="w-64 bg-deep-navy h-full text-white flex flex-col hidden md:flex overflow-y-auto no-scrollbar">
+      <div className="p-6 border-b border-white/10 shrink-0">
+        <h2 className="text-xl font-medium text-white tracking-wider flex items-center gap-2">
           <span className="flex items-center gap-1 uppercase tracking-tighter">THE <img src="/logo.svg" alt="Bat Logo" className="h-4 w-auto object-contain brightness-0 invert" /> STORE</span>
         </h2>
         <div className="mt-3 flex items-center gap-2">

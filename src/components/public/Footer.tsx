@@ -49,68 +49,76 @@ export const Footer: React.FC = () => {
           <section className="hidden md:block py-8 bg-white border-t border-gray-100 relative z-10">
             <div className="container mx-auto px-4 lg:px-8">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <motion.div 
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-default group"
-                >
-                  <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 text-sapphire rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <Truck size={22} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.shipping.title')}</h3>
-                    <p className="text-gray-500 text-xs hidden sm:block">{t('feature.shipping.desc')}</p>
-                  </div>
-                </motion.div>
+                <Link to="/shipping" className="block outline-none h-full">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group h-full"
+                  >
+                    <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 text-sapphire rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                      <Truck size={22} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.shipping.title')}</h3>
+                      <p className="text-gray-500 text-xs hidden sm:block">{t('feature.shipping.desc')}</p>
+                    </div>
+                  </motion.div>
+                </Link>
 
-                <motion.div 
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-default group"
-                >
-                  <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <ShieldCheck size={22} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.security.title')}</h3>
-                    <p className="text-gray-500 text-xs hidden sm:block">{t('feature.security.desc')}</p>
-                  </div>
-                </motion.div>
+                <Link to="/payments" className="block outline-none h-full">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group h-full"
+                  >
+                    <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                      <ShieldCheck size={22} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.security.title')}</h3>
+                      <p className="text-gray-500 text-xs hidden sm:block">{t('feature.security.desc')}</p>
+                    </div>
+                  </motion.div>
+                </Link>
 
-                <motion.div 
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-default group"
-                >
-                  <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <Clock size={22} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.support.title')}</h3>
-                    <p className="text-gray-500 text-xs hidden sm:block">{t('feature.support.desc')}</p>
-                  </div>
-                </motion.div>
+                <Link to="/faq" className="block outline-none h-full">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group h-full"
+                  >
+                    <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                      <Clock size={22} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.support.title')}</h3>
+                      <p className="text-gray-500 text-xs hidden sm:block">{t('feature.support.desc')}</p>
+                    </div>
+                  </motion.div>
+                </Link>
 
-                <motion.div 
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-default group"
-                >
-                  <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <CreditCard size={22} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.returns.title')}</h3>
-                    <p className="text-gray-500 text-xs hidden sm:block">{t('feature.returns.desc')}</p>
-                  </div>
-                </motion.div>
+                <Link to="/returns" className="block outline-none h-full">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 }}
+                    className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group h-full"
+                  >
+                    <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                      <CreditCard size={22} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-1">{t('feature.returns.title')}</h3>
+                      <p className="text-gray-500 text-xs hidden sm:block">{t('feature.returns.desc')}</p>
+                    </div>
+                  </motion.div>
+                </Link>
               </div>
             </div>
           </section>
@@ -132,40 +140,40 @@ export const Footer: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 {/* Free Shipping */}
-                <div className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                <Link to="/shipping" className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:shadow-lg transition-shadow duration-300 cursor-pointer block h-full outline-none">
                   <div className="w-12 h-12 bg-[#eef4ff] text-[#0057ff] rounded-full flex items-center justify-center mb-4">
                     <Truck size={20} strokeWidth={2} />
                   </div>
                   <h3 className="text-[14px] font-black text-[#0b1021] mb-2">Free Shipping</h3>
                   <p className="text-slate-500 text-[12px] leading-relaxed font-medium">Free delivery on all orders above $50</p>
-                </div>
+                </Link>
 
                 {/* Secure Payments */}
-                <div className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                <Link to="/payments" className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:shadow-lg transition-shadow duration-300 cursor-pointer block h-full outline-none">
                   <div className="w-12 h-12 bg-[#e6fbf2] text-[#00b67a] rounded-full flex items-center justify-center mb-4">
                     <ShieldCheck size={20} strokeWidth={2} />
                   </div>
                   <h3 className="text-[14px] font-black text-[#0b1021] mb-2">Secure Payments</h3>
                   <p className="text-slate-500 text-[12px] leading-relaxed font-medium">100% secure payment methods & data protection</p>
-                </div>
+                </Link>
 
                 {/* 24/7 Support */}
-                <div className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                <Link to="/faq" className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:shadow-lg transition-shadow duration-300 cursor-pointer block h-full outline-none">
                   <div className="w-12 h-12 bg-[#f4eefe] text-[#8b5cf6] rounded-full flex items-center justify-center mb-4">
                     <Clock size={20} strokeWidth={2} />
                   </div>
                   <h3 className="text-[14px] font-black text-[#0b1021] mb-2">24/7 Support</h3>
                   <p className="text-slate-500 text-[12px] leading-relaxed font-medium">We're here for you anytime, anywhere</p>
-                </div>
+                </Link>
 
                 {/* Easy Returns */}
-                <div className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                <Link to="/returns" className="bg-white rounded-[20px] p-5 flex flex-col items-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:shadow-lg transition-shadow duration-300 cursor-pointer block h-full outline-none">
                   <div className="w-12 h-12 bg-[#fff1e6] text-[#f97316] rounded-full flex items-center justify-center mb-4">
                     <Package size={20} strokeWidth={2} />
                   </div>
                   <h3 className="text-[14px] font-black text-[#0b1021] mb-2">Easy Returns</h3>
                   <p className="text-slate-500 text-[12px] leading-relaxed font-medium">Hassle-free returns within 30 days</p>
-                </div>
+                </Link>
               </div>
             </div>
           </section>

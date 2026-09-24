@@ -70,7 +70,7 @@ const Brands: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
             <Tag className="text-sapphire" /> Brand Management
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage product brands and manufacturers</p>
@@ -101,7 +101,7 @@ const Brands: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
             <thead>
-              <tr className="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider font-black border-b border-gray-100">
+              <tr className="bg-gray-50/50 text-gray-400 text-xs uppercase tracking-wider font-medium border-b border-gray-100">
                 <th className="px-6 py-4">Brand Name</th>
                 {isSuperAdmin && <th className="px-6 py-4">Products Associated</th>}
                 <th className="px-6 py-4">Status</th>
@@ -116,16 +116,16 @@ const Brands: React.FC = () => {
               ) : (
                 filteredBrands.map(brand => (
                   <tr key={brand.id} className="hover:bg-blue-50/30 transition-colors group">
-                    <td className="px-6 py-4 font-black text-gray-900">{brand.name}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{brand.name}</td>
                     {isSuperAdmin && (
                       <td className="px-6 py-4 text-gray-600 font-semibold">
-                        <span className="font-black text-sapphire bg-blue-50/60 border border-blue-100/30 px-2.5 py-0.5 rounded-md text-xs">{getProductCount(brand.name)}</span> products
+                        <span className="font-medium text-sapphire bg-blue-50/60 border border-blue-100/30 px-2.5 py-0.5 rounded-md text-xs">{getProductCount(brand.name)}</span> products
                       </td>
                     )}
                     <td className="px-6 py-4">
                       <button 
                         onClick={() => handleToggleStatus(brand)}
-                        className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider cursor-pointer transition-colors border-none ${
+                        className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider cursor-pointer transition-colors border-none ${
                           brand.status === 'Active' 
                             ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100/60' 
                             : 'bg-rose-50 text-rose-700 hover:bg-rose-100/60'
@@ -188,10 +188,10 @@ const Brands: React.FC = () => {
                     <Tag size={16} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-gray-900 leading-tight">
+                    <h3 className="text-base font-medium text-gray-900 leading-tight">
                       {editingBrand ? 'Modify Brand' : 'Add New Brand'}
                     </h3>
-                    <p className="text-[10px] text-gray-400 font-bold mt-0.5">Manage manufacturer names & states</p>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">Manage manufacturer names & states</p>
                   </div>
                 </div>
                 <button
@@ -213,17 +213,17 @@ const Brands: React.FC = () => {
                     placeholder="e.g. Sony" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
-                    className="font-bold text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs" 
+                    className="font-medium text-gray-900 border-gray-200 focus:ring-sapphire/15 rounded-xl py-2.5 text-xs" 
                   />
                 </div>
 
                 {/* Status Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest">Active Status</label>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Active Status</label>
                   <select 
                     value={status} 
                     onChange={(e) => setStatus(e.target.value as 'Active' | 'Inactive')}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 cursor-pointer text-xs"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 cursor-pointer text-xs"
                   >
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -235,13 +235,13 @@ const Brands: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={() => { setIsAddMode(false); setEditingBrand(null); }}
-                    className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 font-black uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
+                    className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-black uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
+                    className="flex-1 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-medium uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
                   >
                     {editingBrand ? 'Save Changes' : 'Add Brand'}
                   </button>

@@ -31,7 +31,7 @@ const Settings: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
             <SettingsIcon className="text-sapphire" /> Platform Settings
           </h1>
           <p className="text-gray-500 text-sm mt-1">Configure global store settings, shipping, and SEO</p>
@@ -88,7 +88,7 @@ const Settings: React.FC = () => {
             
             {activeTab === 'general' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-bold text-gray-900 border-b pb-4 mb-6">General Store Details</h2>
+                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">General Store Details</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -148,7 +148,7 @@ const Settings: React.FC = () => {
             {activeTab === 'shipping' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b pb-4 mb-6">
-                  <h2 className="text-lg font-bold text-gray-900">Shipping Configuration</h2>
+                  <h2 className="text-lg font-medium text-gray-900">Shipping Configuration</h2>
                   <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
                     <AlertCircle size={14} /> Note: Advanced shipping requires Carrier API setup
                   </div>
@@ -157,11 +157,11 @@ const Settings: React.FC = () => {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
                     <div>
-                      <h4 className="font-bold text-gray-900">Flat Rate Shipping</h4>
+                      <h4 className="font-medium text-gray-900">Flat Rate Shipping</h4>
                       <p className="text-sm text-gray-500">Apply a fixed shipping cost to all orders.</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 font-bold">$</span>
+                      <span className="text-gray-500 font-medium">$</span>
                       <input 
                         type="number" 
                         value={form.flatShippingRate}
@@ -173,11 +173,11 @@ const Settings: React.FC = () => {
 
                   <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                     <div>
-                      <h4 className="font-bold text-gray-900">Free Shipping Threshold</h4>
+                      <h4 className="font-medium text-gray-900">Free Shipping Threshold</h4>
                       <p className="text-sm text-gray-500">Orders above this amount receive free shipping.</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 font-bold">$</span>
+                      <span className="text-gray-500 font-medium">$</span>
                       <input 
                         type="number" 
                         value={form.freeShippingThreshold}
@@ -192,7 +192,7 @@ const Settings: React.FC = () => {
 
             {activeTab === 'tax' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-bold text-gray-900 border-b pb-4 mb-6">GST & Tax Settings</h2>
+                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">GST & Tax Settings</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -218,7 +218,7 @@ const Settings: React.FC = () => {
 
             {activeTab === 'seo' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-bold text-gray-900 border-b pb-4 mb-6">Global SEO Default Settings</h2>
+                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">Global SEO Default Settings</h2>
                 
                 <div className="space-y-6">
                   <div>

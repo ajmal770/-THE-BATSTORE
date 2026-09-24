@@ -218,14 +218,14 @@ export const AdminHeader: React.FC = () => {
               >
                 {totalMatches === 0 ? (
                   <div className="px-5 py-6 text-center">
-                    <p className="text-xs text-gray-400 font-bold">No results found for "{globalSearch}"</p>
+                    <p className="text-xs text-gray-400 font-medium">No results found for "{globalSearch}"</p>
                   </div>
                 ) : (
                   <>
                     {/* Products */}
                     {matchedProducts.length > 0 && (
                       <div className="px-4 py-2">
-                        <h4 className="text-[10px] text-gray-450 font-black uppercase tracking-widest px-2 mb-2">Products</h4>
+                        <h4 className="text-[10px] text-gray-450 font-medium uppercase tracking-widest px-2 mb-2">Products</h4>
                         <div className="space-y-1">
                           {matchedProducts.map(p => (
                             <div
@@ -240,9 +240,9 @@ export const AdminHeader: React.FC = () => {
                               <img src={p.image} className="w-8 h-8 rounded-lg object-cover bg-gray-50 border border-gray-100 shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-extrabold text-gray-900 truncate leading-tight">{p.name}</p>
-                                <p className="text-[10px] text-gray-400 font-bold leading-normal">{p.category}</p>
+                                <p className="text-[10px] text-gray-400 font-medium leading-normal">{p.category}</p>
                               </div>
-                              <span className="text-xs font-black text-sapphire shrink-0">${p.price.toFixed(2)}</span>
+                              <span className="text-xs font-medium text-sapphire shrink-0">${p.price.toFixed(2)}</span>
                             </div>
                           ))}
                         </div>
@@ -252,7 +252,7 @@ export const AdminHeader: React.FC = () => {
                     {/* Orders */}
                     {matchedOrders.length > 0 && (
                       <div className="px-4 py-2">
-                        <h4 className="text-[10px] text-gray-455 font-black uppercase tracking-widest px-2 mb-2">Orders</h4>
+                        <h4 className="text-[10px] text-gray-455 font-medium uppercase tracking-widest px-2 mb-2">Orders</h4>
                         <div className="space-y-1">
                           {matchedOrders.map(o => (
                             <div
@@ -269,9 +269,9 @@ export const AdminHeader: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-extrabold text-gray-900 truncate leading-tight">{o.id}</p>
-                                <p className="text-[10px] text-gray-400 font-bold leading-normal">by {o.customer}</p>
+                                <p className="text-[10px] text-gray-400 font-medium leading-normal">by {o.customer}</p>
                               </div>
-                              <span className="text-xs font-black text-gray-950 shrink-0">${o.total.toFixed(2)}</span>
+                              <span className="text-xs font-medium text-gray-950 shrink-0">${o.total.toFixed(2)}</span>
                             </div>
                           ))}
                         </div>
@@ -281,7 +281,7 @@ export const AdminHeader: React.FC = () => {
                     {/* Customers */}
                     {matchedCustomers.length > 0 && (
                       <div className="px-4 py-2">
-                        <h4 className="text-[10px] text-gray-455 font-black uppercase tracking-widest px-2 mb-2">Customers</h4>
+                        <h4 className="text-[10px] text-gray-455 font-medium uppercase tracking-widest px-2 mb-2">Customers</h4>
                         <div className="space-y-1">
                           {matchedCustomers.map(c => (
                             <div
@@ -293,12 +293,12 @@ export const AdminHeader: React.FC = () => {
                               }}
                               className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-2xl cursor-pointer transition-colors"
                             >
-                              <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-medium text-xs shrink-0">
                                 {c.name.charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-extrabold text-gray-900 truncate leading-tight">{c.name}</p>
-                                <p className="text-[10px] text-gray-450 font-bold leading-normal truncate">{c.email}</p>
+                                <p className="text-[10px] text-gray-450 font-medium leading-normal truncate">{c.email}</p>
                               </div>
                             </div>
                           ))}
@@ -327,7 +327,7 @@ export const AdminHeader: React.FC = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-medium rounded-full flex items-center justify-center border-2 border-white shadow-sm"
                 >
                   {unreadCount}
                 </motion.span>
@@ -347,13 +347,13 @@ export const AdminHeader: React.FC = () => {
                 {/* Header */}
                 <div className="px-5 pb-3 border-b border-gray-100 flex items-center justify-between">
                   <div>
-                    <h4 className="font-black text-gray-900 text-sm">Notifications</h4>
-                    <p className="text-[10px] text-gray-400 font-bold mt-0.5">{unreadCount} Unread</p>
+                    <h4 className="font-medium text-gray-900 text-sm">Notifications</h4>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">{unreadCount} Unread</p>
                   </div>
                   {unreadCount > 0 && (
                     <button 
                       onClick={handleMarkAllAsRead}
-                      className="text-sapphire hover:text-deep-navy text-xs font-bold bg-transparent border-none cursor-pointer flex items-center gap-1"
+                      className="text-sapphire hover:text-deep-navy text-xs font-medium bg-transparent border-none cursor-pointer flex items-center gap-1"
                     >
                       <Check size={12} className="stroke-[3]" /> Mark all as read
                     </button>
@@ -377,11 +377,11 @@ export const AdminHeader: React.FC = () => {
                         {getIcon(item.type)}
                         
                         <div className="flex-1 space-y-0.5">
-                          <h5 className={`text-xs text-gray-900 font-black leading-tight ${item.unread ? 'text-gray-950 font-black' : 'text-gray-500 font-semibold'}`}>
+                          <h5 className={`text-xs text-gray-900 font-medium leading-tight ${item.unread ? 'text-gray-950 font-medium' : 'text-gray-500 font-semibold'}`}>
                             {item.title}
                           </h5>
                           <p className="text-[11px] text-gray-500 leading-normal font-medium">{item.description}</p>
-                          <span className="text-[9px] text-gray-400 font-bold block pt-0.5">{item.time}</span>
+                          <span className="text-[9px] text-gray-400 font-medium block pt-0.5">{item.time}</span>
                         </div>
                       </div>
                     ))
@@ -401,7 +401,7 @@ export const AdminHeader: React.FC = () => {
                   <div className="px-5 pt-3 border-t border-gray-100 flex justify-end">
                     <button 
                       onClick={handleClearAll}
-                      className="text-red-500 hover:text-red-600 text-xs font-black flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+                      className="text-red-500 hover:text-red-600 text-xs font-medium flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
                     >
                       <Trash2 size={12} /> Clear All
                     </button>
@@ -417,12 +417,12 @@ export const AdminHeader: React.FC = () => {
 
         {/* Profile Info & Logout */}
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-sapphire text-white flex items-center justify-center font-black text-base shadow-sm shrink-0 border border-sapphire/15 select-none">
+          <div className="w-10 h-10 rounded-full bg-sapphire text-white flex items-center justify-center font-medium text-base shadow-sm shrink-0 border border-sapphire/15 select-none">
             <span className="leading-none">{user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'A'}</span>
           </div>
           <div className="hidden md:flex flex-col justify-center">
-            <p className="text-xs font-black text-gray-900 leading-none">{user?.displayName || 'Admin User'}</p>
-            <p className="text-[8px] text-gray-400 font-black tracking-widest mt-1 uppercase leading-none">{user?.role}</p>
+            <p className="text-xs font-medium text-gray-900 leading-none">{user?.displayName || 'Admin User'}</p>
+            <p className="text-[8px] text-gray-400 font-medium tracking-widest mt-1 uppercase leading-none">{user?.role}</p>
           </div>
           <button 
             onClick={handleLogout} 
