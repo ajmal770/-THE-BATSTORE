@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Eye, Download, Package, CheckCircle, Truck, X, User, Mail, MapPin, Phone, Calendar, CreditCard, ShieldCheck, RefreshCw, Check, ChevronDown, Filter, Hash, Copy } from 'lucide-react';
+import { Search, Eye, Download, Package, CheckCircle, Truck, X, User, Mail, MapPin, Phone, Calendar, CreditCard, ShieldCheck, RefreshCw, Check, ChevronDown, Filter, Hash } from 'lucide-react';
 import { useOrderStore } from '../../store/orderStore';
 import type { Order } from '../../store/orderStore';
 import { motion, AnimatePresence } from 'framer-motion';
