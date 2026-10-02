@@ -90,70 +90,104 @@ const Coupons: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/10 border border-gray-100 overflow-hidden flex flex-col w-full">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 text-xs uppercase tracking-wider font-medium">
-                <th className="px-6 py-4">Coupon Code</th>
-                <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4">Value</th>
-                <th className="px-6 py-4">Min Order</th>
-                <th className="px-6 py-4">Usage</th>
-                <th className="px-6 py-4">Expiry</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-center">Actions</th>
+        <div className="overflow-x-auto custom-scrollbar px-2 pb-10">
+          <table className="w-full text-left whitespace-nowrap border-separate border-spacing-y-3">
+            <thead className="sticky top-0 bg-white/95 backdrop-blur-sm z-20">
+              <tr className="text-gray-400 text-[11px] uppercase tracking-[0.15em] font-bold">
+                <th className="px-6 py-4 font-bold rounded-l-xl">Coupon Code</th>
+                <th className="px-6 py-4 font-bold">Type</th>
+                <th className="px-6 py-4 font-bold">Value</th>
+                <th className="px-6 py-4 font-bold">Min Order</th>
+                <th className="px-6 py-4 font-bold">Usage</th>
+                <th className="px-6 py-4 font-bold">Expiry</th>
+                <th className="px-6 py-4 font-bold">Status</th>
+                <th className="px-6 py-4 font-bold text-center rounded-r-xl">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100/60 text-sm">
+            <tbody className="text-sm">
               {coupons.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-gray-400 font-semibold">No coupons active.</td>
+                  <td colSpan={8} className="px-6 py-16 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-gray-50/50 flex items-center justify-center mb-5 border border-gray-100">
+                        <Tag size={28} className="text-gray-400" />
+                      </div>
+                      <p className="text-lg font-bold text-gray-900 mb-1">No coupons active</p>
+                      <p className="text-sm font-medium">Create a new coupon to get started.</p>
+                    </div>
+                  </td>
                 </tr>
               ) : (
-                coupons.map((coupon) => (
-                  <tr key={coupon.id} className="hover:bg-blue-50/30 transition-colors">
-                    <td className="px-6 py-4 font-medium text-sapphire flex items-center gap-2">
-                      <Tag size={15} className="text-sapphire" /> {coupon.code}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 font-medium">{coupon.type}</td>
-                    <td className="px-6 py-4 text-gray-900 font-extrabold">
-                      {coupon.type === 'Percentage' ? `${coupon.value}%` : 
-                       coupon.type === 'Fixed Amount' ? `$${coupon.value.toFixed(2)}` : 'Free Shipping'}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 font-semibold">${coupon.minOrder.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-gray-550 font-medium">{coupon.usage} {coupon.usage === 1 ? 'time' : 'times'}</td>
-                    <td className="px-6 py-4 text-gray-500 font-semibold">{coupon.expiry}</td>
-                    <td className="px-6 py-4">
-                      <button 
-                        onClick={() => handleToggleStatus(coupon)}
-                        className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider cursor-pointer transition-colors border-none ${
-                          coupon.status === 'Active' 
-                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100/60' 
-                            : 'bg-rose-50 text-rose-700 hover:bg-rose-100/60'
-                        }`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${coupon.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                        {coupon.status}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-3">
+                coupons.map((coupon) => {
+                  const tdClass = "px-6 py-5 bg-white border-y border-gray-100/50 group-hover:border-sapphire/20 transition-all first:border-l first:rounded-l-2xl last:border-r last:rounded-r-2xl";
+                  return (
+                    <tr key={coupon.id} className="group transition-all hover:shadow-md cursor-pointer">
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-sapphire/5 text-sapphire flex items-center justify-center shrink-0 shadow-sm border border-sapphire/10 group-hover:bg-sapphire/10 transition-colors">
+                            <Tag size={16} className="transform -rotate-90" />
+                          </div>
+                          <span className="font-mono font-bold text-gray-900 tracking-tight text-base">{coupon.code}</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-gray-700">{coupon.type}</span>
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Discount</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <span className="font-extrabold text-sapphire text-base">
+                          {coupon.type === 'Percentage' ? `${coupon.value}%` : 
+                           coupon.type === 'Fixed Amount' ? `$${coupon.value.toFixed(2)}` : 'Free'}
+                        </span>
+                      </td>
+                      <td className={tdClass}>
+                        <span className="font-bold text-gray-700">${coupon.minOrder.toFixed(2)}</span>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-2 text-gray-500 font-bold">
+                          <div className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-xs">
+                            {coupon.usage}
+                          </div>
+                          <span className="text-[10px] uppercase tracking-wider">{coupon.usage === 1 ? 'time' : 'times'}</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <span className="font-semibold text-gray-500">{coupon.expiry}</span>
+                      </td>
+                      <td className={tdClass}>
                         <button 
-                          onClick={() => handleEditClick(coupon)}
-                          className="p-1.5 text-gray-400 hover:text-sapphire hover:bg-blue-50/50 rounded-lg transition-all cursor-pointer border-none bg-transparent"
+                          onClick={() => handleToggleStatus(coupon)}
+                          className={`inline-flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border border-black/5 cursor-pointer transition-colors ${
+                            coupon.status === 'Active' 
+                              ? 'bg-emerald-100/50 text-emerald-700 hover:bg-emerald-100' 
+                              : 'bg-rose-100/50 text-rose-700 hover:bg-rose-100'
+                          }`}
                         >
-                          <Edit2 size={15} />
+                          <span className={`w-1.5 h-1.5 rounded-full ${coupon.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                          {coupon.status}
                         </button>
-                        <button 
-                          onClick={() => handleDelete(coupon.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50/50 rounded-lg transition-all cursor-pointer border-none bg-transparent"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className={`${tdClass} text-center`}>
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            onClick={() => handleEditClick(coupon)}
+                            className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-sapphire hover:bg-sapphire/10 hover:border-sapphire/20 rounded-xl transition-all cursor-pointer border border-transparent"
+                          >
+                            <Edit2 size={15} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(coupon.id)}
+                            className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 rounded-xl transition-all cursor-pointer border border-transparent"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

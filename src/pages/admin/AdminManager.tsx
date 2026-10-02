@@ -43,6 +43,9 @@ const AdminManager: React.FC = () => {
     setSuccess(`Admin account for "${form.displayName}" created successfully!`);
     setForm({ displayName: '', email: '', password: '' });
     setShowForm(false);
+    
+    // Auto clear success message after 3 seconds
+    setTimeout(() => setSuccess(''), 3000);
   };
 
   const handleDelete = (uid: string, name: string) => {
@@ -52,54 +55,124 @@ const AdminManager: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/60 backdrop-blur-xl p-6 rounded-3xl border border-white/40 shadow-sm">
         <div>
-          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-            <Crown className="text-yellow-500" size={26} /> Admin Manager
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-deep-navy to-sapphire flex items-center gap-3">
+            <Crown className="text-yellow-500" size={32} /> Admin Manager
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Create and manage admin accounts for the dashboard.</p>
+          <p className="text-gray-500 text-sm mt-1.5 font-medium ml-11">Create and manage admin accounts for the dashboard</p>
         </div>
-        {isSuperAdmin && (
-          <button
-            onClick={() => { setShowForm(true); setError(''); setSuccess(''); }}
-            className="flex items-center gap-2 bg-sapphire text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-deep-navy transition-colors shadow-md shadow-sapphire/20"
-          >
-            <Plus size={18} /> Create Admin
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {success && (
+            <span className="text-emerald-600 bg-emerald-50/80 backdrop-blur-md px-4 py-2.5 rounded-2xl text-sm font-bold tracking-wide border border-emerald-200/60 animate-pulse flex items-center gap-2 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" /> {success}
+            </span>
+          )}
+          {isSuperAdmin && (
+            <button
+              onClick={() => { setShowForm(true); setError(''); setSuccess(''); }}
+              className="group relative px-6 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-2xl font-semibold tracking-wide overflow-hidden shadow-lg shadow-sapphire/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+              <Plus size={20} className="relative z-10" />
+              <span className="relative z-10">Create Admin</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Super Admin info badge */}
-      <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 flex items-start gap-4">
-        <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center shrink-0">
-          <Crown className="text-yellow-600" size={20} />
+      <div className="bg-gradient-to-r from-yellow-50/80 to-amber-50/80 backdrop-blur-md border border-yellow-200/60 rounded-3xl p-6 flex items-start gap-5 shadow-sm">
+        <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center shrink-0 border border-white shadow-inner">
+          <Crown className="text-yellow-600" size={24} />
         </div>
         <div>
-          <p className="font-medium text-yellow-900">Super Admin</p>
-          <p className="text-sm text-yellow-700 mt-0.5">superadmin@thebatstore.com</p>
-          <span className="inline-block mt-1 text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full font-semibold">Hardcoded · Cannot be deleted</span>
+          <p className="text-lg font-bold text-yellow-900">Super Admin Account</p>
+          <p className="text-sm font-medium text-yellow-700/80 mt-1">superadmin@thebatstore.com</p>
+          <span className="inline-flex items-center mt-2.5 text-[10px] uppercase tracking-widest bg-yellow-200/50 text-yellow-800 px-3 py-1.5 rounded-full font-bold border border-yellow-300/30">
+            Hardcoded • Cannot be deleted
+          </span>
         </div>
       </div>
 
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
-          ✅ {success}
+      {/* Admin Accounts List */}
+      <div className="bg-white/80 backdrop-blur-xl border border-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <div className="px-8 py-6 border-b border-gray-100/60 flex items-center justify-between bg-white/40">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+              <Users size={20} />
+            </div>
+            Active Administrators
+          </h2>
+          <span className="text-xs bg-gray-100/80 backdrop-blur-md text-gray-600 px-4 py-2 rounded-2xl font-bold border border-gray-200/50 shadow-inner">
+            {adminAccounts.length} accounts
+          </span>
         </div>
-      )}
 
-      {/* Create Admin Form */}
+        {adminAccounts.length === 0 ? (
+          <div className="p-16 text-center text-gray-400 bg-gray-50/30">
+            <div className="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-white">
+              <Users size={32} className="opacity-40" />
+            </div>
+            <p className="text-lg font-bold text-gray-900">No admin accounts created yet</p>
+            <p className="text-sm font-medium mt-2">Click "Create Admin" to add your first administrator.</p>
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="space-y-4">
+              {adminAccounts.map((admin) => (
+                <div 
+                  key={admin.uid} 
+                  className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-sapphire/30 hover:shadow-xl hover:shadow-sapphire/5 transition-all duration-300 group flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center font-bold text-sapphire text-xl shadow-inner border border-white">
+                      {admin.displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-base font-bold text-gray-900 group-hover:text-sapphire transition-colors">{admin.displayName}</p>
+                      <p className="text-sm font-medium text-gray-500 mt-0.5">{admin.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6 justify-between sm:justify-end border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0">
+                    <div className="text-left sm:text-right">
+                      <span className="inline-block text-[10px] bg-blue-50 text-sapphire px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-blue-100/50">
+                        Admin
+                      </span>
+                      <p className="text-xs font-medium text-gray-400 mt-1.5 flex items-center gap-1.5 sm:justify-end">
+                        <Calendar size={12} /> {new Date(admin.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => handleDelete(admin.uid, admin.displayName)}
+                        className="p-2.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-rose-100 shadow-sm"
+                        title="Delete admin"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Advanced Create Admin Modal */}
       <AnimatePresence>
         {showForm && isSuperAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-            {/* Backdrop */}
+            {/* Glassmorphism Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => { setShowForm(false); setError(''); setSuccess(''); }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => { setShowForm(false); setError(''); }}
+              className="absolute inset-0 bg-deep-navy/40 backdrop-blur-md"
             />
 
             {/* Modal Box */}
@@ -107,105 +180,118 @@ const AdminManager: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
-              className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-gray-100/80 z-10"
+              transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
+              className="relative w-full max-w-xl bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-white/60 z-10"
             >
               {/* Modal Header */}
-              <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50/60 via-white to-gray-50/30 relative">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sapphire to-blue-500" />
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-50 text-sapphire rounded-xl flex items-center justify-center border border-blue-100/35">
-                    <Shield size={18} className="stroke-[2.5]" />
+              <div className="px-8 py-6 border-b border-gray-100/60 flex items-center justify-between bg-white/50 relative">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sapphire to-blue-400" />
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 text-sapphire rounded-2xl flex items-center justify-center shadow-inner border border-white">
+                    <Shield size={20} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 leading-tight">New Admin Account</h3>
-                    <p className="text-[11px] text-gray-400 font-medium mt-0.5">Provision a new administrator profile with secure credentials</p>
+                    <h3 className="text-xl font-bold text-gray-900 leading-tight">New Admin Account</h3>
+                    <p className="text-xs text-gray-500 font-medium mt-1">Provision a new administrator profile</p>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); setError(''); setSuccess(''); }}
-                  className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors cursor-pointer text-gray-400 hover:text-gray-600 border border-gray-100 flex items-center justify-center shadow-sm"
+                  onClick={() => { setShowForm(false); setError(''); }}
+                  className="p-2.5 bg-white hover:bg-gray-50 rounded-xl transition-all cursor-pointer text-gray-400 hover:text-gray-600 border border-gray-100 flex items-center justify-center shadow-sm hover:shadow"
                 >
-                  <X size={16} className="stroke-[2.5]" />
+                  <X size={18} className="stroke-[2.5]" />
                 </button>
               </div>
 
               {/* Modal Form */}
-              <form onSubmit={handleCreate} className="p-8 overflow-y-auto space-y-6 bg-white text-xs">
+              <form onSubmit={handleCreate} className="p-8 overflow-y-auto space-y-6 bg-white/40">
                 {error && (
-                  <div className="bg-rose-50 border border-rose-200 text-rose-600 text-xs px-4 py-3.5 rounded-xl font-medium">
-                    ⚠️ {error}
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-rose-50/80 backdrop-blur-sm border border-rose-200/60 text-rose-700 text-sm px-5 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-sm"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                    {error}
+                  </motion.div>
                 )}
 
-                {/* Display Name Input */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Display Name</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="text"
-                      value={form.displayName}
-                      onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-                      placeholder="e.g. John Admin"
-                      required
-                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 placeholder-gray-400"
-                    />
+                <div className="space-y-6">
+                  {/* Display Name Input */}
+                  <div className="space-y-2.5">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Display Name</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 text-gray-400 group-focus-within:text-sapphire transition-colors z-10">
+                        <User size={14} />
+                      </div>
+                      <input
+                        type="text"
+                        value={form.displayName}
+                        onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+                        placeholder="e.g. John Admin"
+                        required
+                        className="w-full pl-15 pr-4 py-4 bg-white/60 border border-gray-200 rounded-2xl text-sm text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 placeholder-gray-400 shadow-sm"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="admin@example.com"
-                      required
-                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 placeholder-gray-400"
-                    />
+                  {/* Email Input */}
+                  <div className="space-y-2.5">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 text-gray-400 group-focus-within:text-sapphire transition-colors z-10">
+                        <Mail size={14} />
+                      </div>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        placeholder="admin@example.com"
+                        required
+                        className="w-full pl-15 pr-4 py-4 bg-white/60 border border-gray-200 rounded-2xl text-sm text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 placeholder-gray-400 shadow-sm"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Password Input */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-widest">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.password}
-                      onChange={(e) => setForm({ ...form, password: e.target.value })}
-                      placeholder="Min 6 characters"
-                      required
-                      className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/15 transition-all focus:border-sapphire/35 placeholder-gray-400"
-                    />
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPassword(!showPassword)} 
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer flex items-center justify-center p-1.5 hover:bg-gray-100 rounded-lg transition-all"
-                    >
-                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
+                  {/* Password Input */}
+                  <div className="space-y-2.5">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Secure Password</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 text-gray-400 group-focus-within:text-sapphire transition-colors z-10">
+                        <Lock size={14} />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={form.password}
+                        onChange={(e) => setForm({ ...form, password: e.target.value })}
+                        placeholder="Min 6 characters"
+                        required
+                        className="w-full pl-15 pr-14 py-4 bg-white/60 border border-gray-200 rounded-2xl text-sm text-gray-900 font-semibold focus:outline-none focus:bg-white focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 placeholder-gray-400 shadow-sm"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)} 
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-100 text-gray-400 hover:text-sapphire transition-colors cursor-pointer z-10"
+                      >
+                        {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Submit / Cancel Buttons */}
-                <div className="pt-6 flex gap-4">
+                <div className="pt-8 flex gap-4">
                   <button 
                     type="button" 
-                    onClick={() => { setShowForm(false); setError(''); setSuccess(''); }}
-                    className="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-600 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors cursor-pointer text-[10px]"
+                    onClick={() => { setShowForm(false); setError(''); }}
+                    className="flex-1 py-4 bg-white border border-gray-200 rounded-2xl text-gray-600 font-bold text-[11px] uppercase tracking-widest hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer shadow-sm"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 py-3.5 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl font-medium uppercase tracking-wider hover:shadow-lg hover:shadow-sapphire/20 transition-all cursor-pointer border-none text-[10px]"
+                    className="flex-1 py-4 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:shadow-lg hover:shadow-sapphire/30 transition-all cursor-pointer border-none shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Create Account
                   </button>
@@ -215,59 +301,6 @@ const AdminManager: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
-
-      {/* Admin Accounts List */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-medium text-gray-900 flex items-center gap-2">
-            <Users size={18} className="text-sapphire" /> Admin Accounts
-          </h2>
-          <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-semibold">
-            {adminAccounts.length} accounts
-          </span>
-        </div>
-
-        {adminAccounts.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">
-            <Users size={40} className="mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No admin accounts created yet.</p>
-            <p className="text-sm mt-1">Click "Create Admin" to add your first admin.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {adminAccounts.map((admin) => (
-              <div key={admin.uid} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-sapphire/10 rounded-full flex items-center justify-center font-medium text-sapphire text-lg">
-                    {admin.displayName.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{admin.displayName}</p>
-                    <p className="text-sm text-gray-500">{admin.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right hidden sm:block">
-                    <span className="text-xs bg-blue-50 text-sapphire px-2 py-0.5 rounded-full font-medium uppercase">Admin</span>
-                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1 justify-end">
-                      <Calendar size={11} /> {new Date(admin.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  {isSuperAdmin && (
-                    <button
-                      onClick={() => handleDelete(admin.uid, admin.displayName)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete admin"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

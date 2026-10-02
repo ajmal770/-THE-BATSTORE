@@ -178,10 +178,10 @@ const Categories: React.FC = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+      <div className="space-y-6">
         
         {/* Categories Table */}
-        <div className={`bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col ${isAddMode ? 'xl:col-span-2' : 'xl:col-span-3'}`}>
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
           <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-200px)] custom-scrollbar">
             <table className="w-full text-left whitespace-nowrap">
               <thead className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
@@ -212,7 +212,9 @@ const Categories: React.FC = () => {
                             </div>
                             <div>
                               <p className="font-bold text-gray-900 text-sm">{category.name}</p>
-                              {category.parent !== '-' && <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Sub-category</p>}
+                              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">
+                                {category.parent === '-' ? 'Top Level Category' : 'Sub-category'}
+                              </p>
                             </div>
                           </div>
                         </td>
@@ -269,88 +271,106 @@ const Categories: React.FC = () => {
           </div>
         </div>
 
-        {/* Add/Edit Category Form */}
-        <AnimatePresence mode="wait">
+        {/* Add/Edit Category Modal */}
+        <AnimatePresence>
           {isAddMode && (
-            <motion.div 
-              initial={{ opacity: 0, x: 20, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 20, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-3xl shadow-xl shadow-gray-200/20 border border-gray-100 overflow-hidden flex flex-col sticky top-24"
-            >
-              <div className="bg-gradient-to-r from-gray-900 to-sapphire px-6 py-5 flex justify-between items-center text-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
-                    {editingCategory ? <Edit2 size={18} /> : <Plus size={18} />}
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold">{editingCategory ? 'Edit Category' : 'New Category'}</h2>
-                    <p className="text-xs font-medium text-white/70">Configure your storefront structure</p>
-                  </div>
-                </div>
-                <button onClick={() => { setIsAddMode(false); setEditingCategory(null); }} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-white/20">
-                  <X size={16} />
-                </button>
-              </div>
-              
-              <div className="p-6 bg-gray-50/50">
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  
-                  <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-                    <InputField 
-                      label="Category Name" 
-                      placeholder="e.g. Smartwatches" 
-                      value={name} 
-                      onChange={handleNameChange} 
-                      icon={Tag}
-                      error={errors.name}
-                    />
-                    
-                    <InputField 
-                      label="URL Slug" 
-                      placeholder="e.g. smartwatches" 
-                      value={slug} 
-                      onChange={setSlug} 
-                      icon={LinkIcon}
-                      error={errors.slug}
-                    />
-                  </div>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => { setIsAddMode(false); setEditingCategory(null); }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              />
 
-                  <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Hierarchy / Parent</label>
-                    <CustomSelect 
-                      value={parent}
-                      onChange={setParent}
-                      options={parentOptions}
-                      icon={Network}
-                    />
-                    <div className="mt-3 flex items-start gap-2 bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
-                      <FolderTree size={16} className="text-sapphire mt-0.5 shrink-0" />
-                      <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                        Selecting a parent category will make this a sub-category. To create a main top-level category, select "None".
-                      </p>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
+                className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-gray-100/80 z-10"
+              >
+                <div className="bg-gradient-to-br from-slate-900 via-deep-navy to-sapphire px-8 py-6 flex justify-between items-center text-white relative overflow-hidden">
+                  {/* Decorative blur elements for glassmorphism */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-sapphire/30 rounded-full blur-xl -ml-5 -mb-5 pointer-events-none" />
+                  
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg shadow-black/20">
+                      {editingCategory ? <Edit2 size={20} className="text-white" /> : <Plus size={20} className="text-white" />}
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black tracking-tight">{editingCategory ? 'Edit Category' : 'New Category'}</h2>
+                      <p className="text-xs font-medium text-blue-100/80 mt-0.5">Configure your storefront structure</p>
                     </div>
                   </div>
+                  <button 
+                    type="button"
+                    onClick={() => { setIsAddMode(false); setEditingCategory(null); }} 
+                    className="relative z-10 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all cursor-pointer border border-transparent hover:border-white/20 hover:rotate-90 duration-300"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                
+                <div className="p-8 overflow-y-auto space-y-6 bg-gray-50/50 text-xs custom-scrollbar">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    
+                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm shadow-gray-200/50 space-y-5">
+                      <InputField 
+                        label="Category Name" 
+                        placeholder="e.g. Smartwatches" 
+                        value={name} 
+                        onChange={handleNameChange} 
+                        icon={Tag}
+                        error={errors.name}
+                      />
+                      
+                      <InputField 
+                        label="URL Slug" 
+                        placeholder="e.g. smartwatches" 
+                        value={slug} 
+                        onChange={setSlug} 
+                        icon={LinkIcon}
+                        error={errors.slug}
+                      />
+                    </div>
 
-                  <div className="pt-2 flex gap-3">
-                    <button 
-                      type="button" 
-                      onClick={() => { setIsAddMode(false); setEditingCategory(null); }}
-                      className="flex-1 py-3.5 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-2xl text-gray-700 font-bold transition-all cursor-pointer shadow-sm"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      className="flex-1 py-3.5 bg-gradient-to-r from-sapphire to-blue-600 hover:from-deep-navy hover:to-sapphire text-white rounded-2xl font-bold shadow-lg shadow-sapphire/25 hover:shadow-sapphire/40 transition-all flex items-center justify-center gap-2 cursor-pointer border-none hover:-translate-y-0.5"
-                    >
-                      <Check size={18} /> {editingCategory ? 'Update' : 'Create'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </motion.div>
+                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm shadow-gray-200/50">
+                      <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Hierarchy / Parent</label>
+                      <CustomSelect 
+                        value={parent}
+                        onChange={setParent}
+                        options={parentOptions}
+                        icon={Network}
+                      />
+                      <div className="mt-4 flex items-start gap-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                        <FolderTree size={18} className="text-sapphire mt-0.5 shrink-0" />
+                        <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                          Selecting a parent category will make this a sub-category. To create a main top-level category, select "None".
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex gap-4">
+                      <button 
+                        type="button" 
+                        onClick={() => { setIsAddMode(false); setEditingCategory(null); }}
+                        className="flex-1 py-4 bg-white border border-gray-200 rounded-2xl text-gray-600 font-bold uppercase tracking-wider hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer text-[11px] shadow-sm hover:shadow"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        className="flex-1 py-4 bg-gradient-to-r from-sapphire to-blue-600 hover:from-deep-navy hover:to-sapphire text-white rounded-2xl font-bold uppercase tracking-wider hover:shadow-xl hover:shadow-sapphire/30 transition-all cursor-pointer border-none text-[11px] flex items-center justify-center gap-2 hover:-translate-y-0.5"
+                      >
+                        <Check size={18} /> {editingCategory ? 'Update Category' : 'Create Category'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>

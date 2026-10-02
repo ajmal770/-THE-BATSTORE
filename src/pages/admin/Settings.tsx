@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle, Bookmark } from 'lucide-react';
 import { useSettingsStore, type Settings as SettingsType } from '../../store/settingsStore';
 
 type Tab = 'general' | 'shipping' | 'tax' | 'seo';
@@ -28,161 +28,185 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/60 backdrop-blur-xl p-6 rounded-3xl border border-white/40 shadow-sm">
         <div>
-          <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-            <SettingsIcon className="text-sapphire" /> Platform Settings
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-deep-navy to-sapphire flex items-center gap-3">
+            <SettingsIcon className="text-sapphire" size={32} /> Platform Settings
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Configure global store settings, shipping, and SEO</p>
+          <p className="text-gray-500 text-sm mt-1.5 font-medium ml-11">Configure global store settings, shipping, and SEO</p>
         </div>
         <div className="flex items-center gap-4">
           {isSaved && (
-            <span className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-sm font-semibold border border-green-200 animate-pulse">
-              ✓ Settings Saved Successfully!
+            <span className="text-emerald-600 bg-emerald-50/80 backdrop-blur-md px-4 py-2.5 rounded-2xl text-sm font-bold tracking-wide border border-emerald-200/60 animate-pulse flex items-center gap-2 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" /> Settings Saved!
             </span>
           )}
           <button 
             onClick={handleSave}
-            className="bg-sapphire text-white px-6 py-2 rounded-lg font-medium hover:bg-deep-navy transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+            className="group relative px-6 py-3 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-2xl font-semibold tracking-wide overflow-hidden shadow-lg shadow-sapphire/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
           >
-            <Save size={18} /> Save All Changes
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+            <Save size={20} className="relative z-10" />
+            <span className="relative z-10">Save All Changes</span>
           </button>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Navigation Sidebar */}
-        <div className="w-full lg:w-64 shrink-0">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="w-full lg:w-72 shrink-0">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-3 space-y-1">
             <button 
               onClick={() => setActiveTab('general')}
-              className={`w-full flex items-center gap-3 px-5 py-4 text-left font-medium transition-colors cursor-pointer ${activeTab === 'general' ? 'bg-blue-50 text-sapphire border-l-4 border-sapphire' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'general' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
             >
-              <Globe size={18} /> General Setup
+              <Globe size={20} className={activeTab === 'general' ? 'text-sapphire' : 'text-gray-400'} /> General Setup
             </button>
             <button 
               onClick={() => setActiveTab('shipping')}
-              className={`w-full flex items-center gap-3 px-5 py-4 text-left font-medium transition-colors cursor-pointer ${activeTab === 'shipping' ? 'bg-blue-50 text-sapphire border-l-4 border-sapphire' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'shipping' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
             >
-              <Truck size={18} /> Shipping Config
+              <Truck size={20} className={activeTab === 'shipping' ? 'text-sapphire' : 'text-gray-400'} /> Shipping Config
             </button>
             <button 
               onClick={() => setActiveTab('tax')}
-              className={`w-full flex items-center gap-3 px-5 py-4 text-left font-medium transition-colors cursor-pointer ${activeTab === 'tax' ? 'bg-blue-50 text-sapphire border-l-4 border-sapphire' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'tax' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
             >
-              <Receipt size={18} /> GST & Tax Rates
+              <Receipt size={20} className={activeTab === 'tax' ? 'text-sapphire' : 'text-gray-400'} /> GST & Tax Rates
             </button>
             <button 
               onClick={() => setActiveTab('seo')}
-              className={`w-full flex items-center gap-3 px-5 py-4 text-left font-medium transition-colors cursor-pointer ${activeTab === 'seo' ? 'bg-blue-50 text-sapphire border-l-4 border-sapphire' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'seo' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
             >
-              <Search size={18} /> Global SEO
+              <Search size={20} className={activeTab === 'seo' ? 'text-sapphire' : 'text-gray-400'} /> Global SEO
             </button>
           </div>
         </div>
 
         {/* Settings Content */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-8 lg:p-10">
             
             {activeTab === 'general' && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">General Store Details</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 pb-6 border-b border-gray-100/60">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+                    <Globe size={20} />
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Name</label>
+                    <h2 className="text-xl font-bold text-gray-900">General Store Details</h2>
+                    <p className="text-xs text-gray-500 font-medium">Manage primary store identity and contact information</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Store Name</label>
                     <input 
                       type="text" 
                       value={form.storeName}
                       onChange={(e) => handleChange('storeName', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Support Email</label>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Support Email</label>
                     <input 
                       type="email" 
                       value={form.supportEmail}
                       onChange={(e) => handleChange('supportEmail', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Support Phone Number</label>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Support Phone</label>
                     <input 
                       type="text" 
                       value={form.supportPhone}
                       onChange={(e) => handleChange('supportPhone', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Store Currency</label>
-                    <select 
-                      value={form.currency}
-                      onChange={(e) => handleChange('currency', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900"
-                    >
-                      <option value="USD ($)">USD ($)</option>
-                      <option value="EUR (€)">EUR (€)</option>
-                      <option value="INR (₹)">INR (₹)</option>
-                      <option value="GBP (£)">GBP (£)</option>
-                    </select>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Store Currency</label>
+                    <div className="relative">
+                      <select 
+                        value={form.currency}
+                        onChange={(e) => handleChange('currency', e.target.value)}
+                        className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 appearance-none cursor-pointer"
+                      >
+                        <option value="USD ($)">USD ($)</option>
+                        <option value="EUR (€)">EUR (€)</option>
+                        <option value="INR (₹)">INR (₹)</option>
+                        <option value="GBP (£)">GBP (£)</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Store Address</label>
+                <div className="space-y-2 pt-2">
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Store Address</label>
                   <textarea 
                     rows={3} 
                     value={form.address}
                     onChange={(e) => handleChange('address', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900"
+                    className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 resize-none"
                   />
                 </div>
               </div>
             )}
 
             {activeTab === 'shipping' && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b pb-4 mb-6">
-                  <h2 className="text-lg font-medium text-gray-900">Shipping Configuration</h2>
-                  <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
-                    <AlertCircle size={14} /> Note: Advanced shipping requires Carrier API setup
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+                      <Truck size={20} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">Shipping Configuration</h2>
+                      <p className="text-xs text-gray-500 font-medium">Manage delivery costs and thresholds</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50/80 border border-amber-200/50 px-3.5 py-2 rounded-xl shadow-sm">
+                    <AlertCircle size={16} /> Advanced shipping requires Carrier API setup
                   </div>
                 </div>
                 
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div>
-                      <h4 className="font-medium text-gray-900">Flat Rate Shipping</h4>
-                      <p className="text-sm text-gray-500">Apply a fixed shipping cost to all orders.</p>
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border border-gray-100 rounded-2xl bg-gradient-to-r from-gray-50/50 to-white hover:border-gray-200 transition-colors shadow-sm">
+                    <div className="mb-4 sm:mb-0">
+                      <h4 className="font-bold text-gray-900 text-base">Flat Rate Shipping</h4>
+                      <p className="text-sm text-gray-500 mt-1">Apply a fixed shipping cost to all orders regardless of size.</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500 font-medium">$</span>
+                    <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-inner">
+                      <span className="text-gray-400 font-bold">$</span>
                       <input 
                         type="number" 
                         value={form.flatShippingRate}
                         onChange={(e) => handleChange('flatShippingRate', parseFloat(e.target.value) || 0)}
-                        className="w-24 px-3 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-sapphire outline-none bg-white text-gray-900" 
+                        className="w-20 text-right font-bold text-gray-900 focus:outline-none bg-transparent" 
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
-                      <h4 className="font-medium text-gray-900">Free Shipping Threshold</h4>
-                      <p className="text-sm text-gray-500">Orders above this amount receive free shipping.</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border border-gray-100 rounded-2xl bg-gradient-to-r from-gray-50/50 to-white hover:border-gray-200 transition-colors shadow-sm">
+                    <div className="mb-4 sm:mb-0">
+                      <h4 className="font-bold text-gray-900 text-base">Free Shipping Threshold</h4>
+                      <p className="text-sm text-gray-500 mt-1">Orders above this subtotal automatically receive free shipping.</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500 font-medium">$</span>
+                    <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-inner">
+                      <span className="text-gray-400 font-bold">$</span>
                       <input 
                         type="number" 
                         value={form.freeShippingThreshold}
                         onChange={(e) => handleChange('freeShippingThreshold', parseFloat(e.target.value) || 0)}
-                        className="w-24 px-3 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-sapphire outline-none bg-white text-gray-900" 
+                        className="w-20 text-right font-bold text-gray-900 focus:outline-none bg-transparent" 
                       />
                     </div>
                   </div>
@@ -191,72 +215,96 @@ const Settings: React.FC = () => {
             )}
 
             {activeTab === 'tax' && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">GST & Tax Settings</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 pb-6 border-b border-gray-100/60">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+                    <Receipt size={20} />
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Default Tax Rate (%)</label>
+                    <h2 className="text-xl font-bold text-gray-900">GST & Tax Settings</h2>
+                    <p className="text-xs text-gray-500 font-medium">Configure calculation logic and default rates</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Default Tax Rate (%)</label>
                     <input 
                       type="number" 
                       value={form.defaultTaxRate}
                       onChange={(e) => handleChange('defaultTaxRate', parseFloat(e.target.value) || 0)}
                       step="0.1" 
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-bold focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tax Calculation Logic</label>
-                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900">
-                      <option>Prices entered are exclusive of tax</option>
-                      <option>Prices entered are inclusive of tax</option>
-                    </select>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Tax Calculation Logic</label>
+                    <div className="relative">
+                      <select className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 appearance-none cursor-pointer">
+                        <option>Prices entered are exclusive of tax</option>
+                        <option>Prices entered are inclusive of tax</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
             {activeTab === 'seo' && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-medium text-gray-900 border-b pb-4 mb-6">Global SEO Default Settings</h2>
-                
-                <div className="space-y-6">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 pb-6 border-b border-gray-100/60">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+                    <Search size={20} />
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Default Meta Title</label>
+                    <h2 className="text-xl font-bold text-gray-900">Global SEO Settings</h2>
+                    <p className="text-xs text-gray-500 font-medium">Manage default metadata and tracking IDs</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Google Analytics ID</label>
+                      <input 
+                        type="text" 
+                        placeholder="G-XXXXXXXXXX" 
+                        value={form.googleAnalyticsId}
+                        onChange={(e) => handleChange('googleAnalyticsId', e.target.value)}
+                        className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Meta Pixel ID</label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter Meta Pixel ID" 
+                        value={form.metaPixelId}
+                        onChange={(e) => handleChange('metaPixelId', e.target.value)}
+                        className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 pt-2 border-t border-gray-100/60 mt-6">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mt-6">Default Meta Title</label>
                     <input 
                       type="text" 
                       value={form.metaTitle}
                       onChange={(e) => handleChange('metaTitle', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-bold focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40" 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Default Meta Description</label>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Default Meta Description</label>
                     <textarea 
-                      rows={3} 
+                      rows={4} 
                       value={form.metaDescription}
                       onChange={(e) => handleChange('metaDescription', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Google Analytics ID</label>
-                    <input 
-                      type="text" 
-                      placeholder="G-XXXXXXXXXX" 
-                      value={form.googleAnalyticsId}
-                      onChange={(e) => handleChange('googleAnalyticsId', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Meta Pixel ID</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter Meta Pixel ID" 
-                      value={form.metaPixelId}
-                      onChange={(e) => handleChange('metaPixelId', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sapphire focus:border-sapphire outline-none bg-white text-gray-900" 
+                      className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 resize-none leading-relaxed" 
                     />
                   </div>
                 </div>

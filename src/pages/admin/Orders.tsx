@@ -175,62 +175,98 @@ const Orders: React.FC = () => {
           </div>
         </div>
         
-        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)] custom-scrollbar">
-          <table className="w-full text-left whitespace-nowrap">
-            <thead className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
-              <tr className="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider font-bold">
-                <th className="px-6 py-5">Order ID</th>
-                <th className="px-6 py-5">Date</th>
-                <th className="px-6 py-5">Customer</th>
-                <th className="px-6 py-5">Items</th>
-                <th className="px-6 py-5">Total</th>
-                <th className="px-6 py-5">Status</th>
-                <th className="px-6 py-5 text-center">Action</th>
+        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)] custom-scrollbar px-2 pb-10">
+          <table className="w-full text-left whitespace-nowrap border-separate border-spacing-y-3">
+            <thead className="sticky top-0 bg-white/95 backdrop-blur-sm z-20">
+              <tr className="text-gray-400 text-[11px] uppercase tracking-[0.15em] font-bold">
+                <th className="px-6 py-4 font-bold rounded-l-xl">Order ID</th>
+                <th className="px-6 py-4 font-bold">Date</th>
+                <th className="px-6 py-4 font-bold">Customer</th>
+                <th className="px-6 py-4 font-bold">Items</th>
+                <th className="px-6 py-4 font-bold">Total</th>
+                <th className="px-6 py-4 font-bold">Status</th>
+                <th className="px-6 py-4 font-bold text-right rounded-r-xl">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 text-sm">
+            <tbody className="text-sm">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-16 text-center text-gray-400">
-                    <Package size={48} className="mx-auto mb-4 opacity-20" />
-                    <p className="font-bold text-gray-500">No orders found.</p>
+                  <td colSpan={7} className="px-6 py-16 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-gray-50/50 flex items-center justify-center mb-5 border border-gray-100">
+                        <Package size={28} className="text-gray-400" />
+                      </div>
+                      <p className="text-lg font-bold text-gray-900 mb-1">No orders found</p>
+                      <p className="text-sm font-medium">Try adjusting your filters or search term.</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
-                  <tr 
-                    key={order.id} 
-                    className={`hover:bg-blue-50/30 transition-colors cursor-pointer group ${selectedOrderId === order.id ? 'bg-blue-50/50' : ''}`}
-                    onClick={() => handleOrderSelect(order)}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-sapphire/10 text-sapphire flex items-center justify-center shrink-0 shadow-sm border border-sapphire/20">
-                          <Hash size={14} />
+                filteredOrders.map((order) => {
+                  const isSelected = selectedOrderId === order.id;
+                  const tdClass = `px-6 py-5 border-y transition-all ${isSelected ? 'bg-blue-50/50 border-sapphire/30' : 'bg-white border-gray-100/50 group-hover:border-sapphire/20'} first:border-l first:rounded-l-2xl last:border-r last:rounded-r-2xl`;
+                  
+                  return (
+                    <tr 
+                      key={order.id} 
+                      className={`group transition-all cursor-pointer ${isSelected ? 'shadow-md relative z-10' : 'hover:shadow-md'}`}
+                      onClick={() => handleOrderSelect(order)}
+                    >
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm border transition-colors ${isSelected ? 'bg-sapphire text-white border-sapphire' : 'bg-sapphire/5 text-sapphire border-sapphire/10 group-hover:bg-sapphire/10'}`}>
+                            <Hash size={16} />
+                          </div>
+                          <span className="font-mono font-bold text-gray-900 tracking-tight">{order.id}</span>
                         </div>
-                        <span className="font-mono font-bold text-gray-900 tracking-tight">{order.id}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500 font-medium">{order.date}</td>
-                    <td className="px-6 py-4 font-bold text-gray-900">{order.customer}</td>
-                    <td className="px-6 py-4 text-gray-500 font-bold">{order.itemsCount} {order.itemsCount === 1 ? 'item' : 'items'}</td>
-                    <td className="px-6 py-4 font-bold text-gray-900">${order.total.toFixed(2)}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${getStatusStyles(order.status).bg}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${getStatusStyles(order.status).dot}`} />
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleOrderSelect(order); }}
-                        className="w-8 h-8 mx-auto rounded-lg bg-gray-50 hover:bg-sapphire hover:text-white text-gray-500 flex items-center justify-center transition-all cursor-pointer border border-gray-200 hover:border-sapphire shadow-sm opacity-0 group-hover:opacity-100"
-                      >
-                        <Eye size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-gray-700">{order.date}</span>
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Placed</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sapphire to-blue-400 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-sapphire/20">
+                            {order.customer.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-900">{order.customer}</span>
+                            <span className="text-[10px] text-gray-400 font-medium">{order.email}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-2 text-gray-500 font-bold">
+                          <div className={`w-7 h-7 rounded-lg border flex items-center justify-center text-xs ${isSelected ? 'bg-white border-sapphire/20 text-sapphire' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
+                            {order.itemsCount}
+                          </div>
+                          <span className="text-xs">{order.itemsCount === 1 ? 'Item' : 'Items'}</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <span className={`font-bold ${isSelected ? 'text-sapphire' : 'text-gray-900'}`}>
+                          ${order.total.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className={tdClass}>
+                        <span className={`inline-flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border border-black/5 ${getStatusStyles(order.status).bg}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${getStatusStyles(order.status).dot}`} />
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className={`${tdClass} text-right`}>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleOrderSelect(order); }}
+                          className={`w-9 h-9 ml-auto rounded-xl flex items-center justify-center transition-all cursor-pointer border shadow-sm ${isSelected ? 'bg-sapphire text-white border-sapphire' : 'bg-white text-gray-400 border-gray-200 hover:bg-sapphire hover:text-white hover:border-sapphire opacity-0 group-hover:opacity-100'}`}
+                        >
+                          <Eye size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -285,89 +321,95 @@ const Orders: React.FC = () => {
               </div>
 
               {/* Modal Body */}
-              <div className="p-8 overflow-y-auto custom-scrollbar grid grid-cols-1 lg:grid-cols-3 gap-8 bg-white max-h-[calc(90vh-100px)]">
+              <div className="p-8 overflow-y-auto custom-scrollbar flex flex-col gap-6 bg-white max-h-[calc(90vh-100px)]">
                 
-                {/* Left Area: Status, Info & Items */}
-                <div className="lg:col-span-2 space-y-6">
-                  
-                  {/* Status Editor Card */}
-                  <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sapphire/5 to-transparent rounded-bl-full -z-10" />
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <Package size={14} className="text-sapphire" /> Delivery Action
-                      </h4>
-                      <p className="text-xs text-gray-500 font-medium">Update current status in real-time</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <CustomSelect 
-                        value={tempStatus}
-                        onChange={setTempStatus}
-                        options={updateStatusOptions}
-                        className="min-w-[140px]"
-                      />
-                      <button
-                        onClick={handleStatusUpdate}
-                        className="bg-gradient-to-r from-sapphire to-blue-600 hover:from-deep-navy hover:to-sapphire shadow-md shadow-sapphire/20 text-white px-5 py-3 rounded-2xl text-sm font-bold transition-all cursor-pointer border-none flex items-center gap-2 hover:-translate-y-0.5"
-                      >
-                        <RefreshCw size={14} /> Update
-                      </button>
-                    </div>
+                {/* Box 1: Delivery Action */}
+                <div className="shrink-0 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sapphire/5 to-transparent rounded-bl-full -z-10" />
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <Package size={14} className="text-sapphire" /> Delivery Action
+                    </h4>
+                    <p className="text-xs text-gray-500 font-medium">Update current status in real-time</p>
                   </div>
+                  <div className="flex gap-3">
+                    <CustomSelect 
+                      value={tempStatus}
+                      onChange={setTempStatus}
+                      options={updateStatusOptions}
+                      className="min-w-[140px]"
+                    />
+                    <button
+                      onClick={handleStatusUpdate}
+                      className="bg-gradient-to-r from-sapphire to-blue-600 hover:from-deep-navy hover:to-sapphire shadow-md shadow-sapphire/20 text-white px-5 py-3 rounded-2xl text-sm font-bold transition-all cursor-pointer border-none flex items-center gap-2 hover:-translate-y-0.5"
+                    >
+                      <RefreshCw size={14} /> Update
+                    </button>
+                  </div>
+                </div>
 
-                  {/* Customer Information Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Recipient Details Card */}
-                    <div className="border border-gray-100 rounded-3xl p-5 bg-gray-50/50 shadow-sm relative overflow-hidden group">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-4">
-                        <User size={14} className="text-sapphire" /> Recipient Details
-                      </h4>
-                      <div className="flex items-center gap-3.5 mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-tr from-sapphire to-blue-400 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-md shadow-sapphire/10">
-                          {selectedOrder.customer.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-sm">{selectedOrder.customer}</p>
-                          <p className="text-[10px] bg-blue-50 text-sapphire px-2 py-0.5 rounded font-bold inline-block mt-0.5 border border-blue-100/30">Customer Profile</p>
-                        </div>
+                {/* Box 2: Customer & Delivery Info */}
+                <div className="shrink-0 border border-gray-100 rounded-3xl p-6 bg-gray-50/50 shadow-sm relative overflow-hidden flex flex-col md:flex-row gap-8">
+                  {/* Recipient Details */}
+                  <div className="flex-1">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-4">
+                      <User size={14} className="text-sapphire" /> Recipient Details
+                    </h4>
+                    <div className="flex items-center gap-3.5 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-tr from-sapphire to-blue-400 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-md shadow-sapphire/10">
+                        {selectedOrder.customer.charAt(0).toUpperCase()}
                       </div>
-                      <div className="space-y-2 border-t border-gray-100 pt-3 text-xs">
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm">{selectedOrder.customer}</p>
+                        <p className="text-[10px] bg-blue-50 text-sapphire px-2 py-0.5 rounded font-bold inline-block mt-0.5 border border-blue-100/30">Customer Profile</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 border-t border-gray-200/60 pt-3 text-xs">
+                      <div className="flex items-center justify-between text-gray-500 font-medium">
+                        <span className="flex items-center gap-1.5"><Mail size={12} className="text-gray-400" /> Email</span>
+                        <span className="font-bold text-gray-900">{selectedOrder.email}</span>
+                      </div>
+                      {selectedOrder.billingInfo.phone && (
                         <div className="flex items-center justify-between text-gray-500 font-medium">
-                          <span className="flex items-center gap-1.5"><Mail size={12} className="text-gray-400" /> Email</span>
-                          <span className="font-bold text-gray-900">{selectedOrder.email}</span>
+                          <span className="flex items-center gap-1.5"><Phone size={12} className="text-gray-400" /> Phone</span>
+                          <span className="font-bold text-gray-900">{selectedOrder.billingInfo.phone}</span>
                         </div>
-                        {selectedOrder.billingInfo.phone && (
-                          <div className="flex items-center justify-between text-gray-500 font-medium">
-                            <span className="flex items-center gap-1.5"><Phone size={12} className="text-gray-400" /> Phone</span>
-                            <span className="font-bold text-gray-900">{selectedOrder.billingInfo.phone}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Delivery Destination Card */}
-                    <div className="border border-gray-100 rounded-3xl p-5 bg-gray-50/50 shadow-sm relative overflow-hidden group">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-4">
-                        <MapPin size={14} className="text-sapphire" /> Delivery Destination
-                      </h4>
-                      <div className="bg-white p-3 rounded-2xl border border-gray-100 flex gap-3 text-xs shadow-sm">
-                        <div className="p-2 bg-gray-50 rounded-xl border border-gray-100 text-sapphire shrink-0 flex items-center justify-center h-fit mt-0.5">
-                          <MapPin size={14} />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-0.5">Street Address</span>
-                          <p className="font-bold text-gray-900 leading-relaxed break-words">{selectedOrder.billingInfo.address}</p>
-                          <p className="font-medium text-gray-500 mt-1">{selectedOrder.billingInfo.city}, {selectedOrder.billingInfo.state} {selectedOrder.billingInfo.zipCode}</p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Items list */}
-                  <div className="border border-gray-100 rounded-3xl p-6 bg-white shadow-sm space-y-4 relative overflow-hidden">
+                  <div className="w-px bg-gray-200 hidden md:block"></div>
+                  <div className="h-px w-full bg-gray-200 md:hidden"></div>
+
+                  {/* Delivery Destination */}
+                  <div className="flex-1">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-4">
+                      <MapPin size={14} className="text-sapphire" /> Delivery Destination
+                    </h4>
+                    <div className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 text-xs shadow-sm">
+                      <div className="p-2 bg-gray-50 rounded-xl border border-gray-100 text-sapphire shrink-0 flex items-center justify-center h-10 w-10">
+                        <MapPin size={16} />
+                      </div>
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Street Address</span>
+                        <p className="font-bold text-gray-900 leading-relaxed break-words text-sm">{selectedOrder.billingInfo.address}</p>
+                        <p className="font-medium text-gray-500 mt-1">{selectedOrder.billingInfo.city}, {selectedOrder.billingInfo.state} {selectedOrder.billingInfo.zipCode}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Box 3: Cart & Milestone */}
+                <div className="shrink-0 border border-gray-100 rounded-3xl bg-white shadow-sm overflow-hidden flex flex-col lg:flex-row relative">
+                  {/* Cart */}
+                  <div className="flex-1 p-6 lg:border-r border-b lg:border-b-0 border-gray-100 space-y-4">
                     <div className="flex justify-between items-center pb-3 border-b border-gray-50">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Ordered Product Cart</h4>
-                      <span className="text-[10px] bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1 rounded-full font-bold">{selectedOrder.items.length} Product Line</span>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <Package size={14} className="text-sapphire"/> Ordered Product Cart
+                      </h4>
+                      <span className="text-[10px] bg-gray-50 text-gray-500 border border-gray-200 px-2.5 py-1 rounded-full font-bold">
+                        {selectedOrder.items.length} Product Line
+                      </span>
                     </div>
                     <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
                       {selectedOrder.items.map((item, idx) => (
@@ -404,15 +446,14 @@ const Orders: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right Area: Timeline */}
-                <div className="border border-gray-100 rounded-3xl p-6 bg-gray-50/50 flex flex-col justify-between h-fit relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-500/5 to-transparent rounded-bl-full -z-10" />
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Delivery Milestone</h4>
+                  {/* Timeline */}
+                  <div className="flex-1 p-6 bg-gray-50/50 relative overflow-hidden h-full">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-500/5 to-transparent rounded-bl-full -z-10" />
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-6">
+                      <Truck size={14} className="text-sapphire" /> Delivery Milestone
+                    </h4>
                     <div className="space-y-6">
-                      
                       {/* Step 1: Placed */}
                       <div className="flex gap-4 relative">
                         <div className="absolute left-[13px] top-6 bottom-[-24px] w-0.5 bg-green-200"></div>
@@ -492,7 +533,6 @@ const Orders: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
               </div>
             </motion.div>
           </div>
