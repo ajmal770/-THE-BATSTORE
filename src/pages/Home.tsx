@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   ArrowRight, Star, Heart, Zap, ShoppingCart, Box,
-  X, CheckCircle2, Sparkles, RefreshCw, Check, Layers, Clock,
+  X, CheckCircle2, Sparkles, RefreshCw, Check, Clock,
   ShieldCheck, Truck, Smartphone, Headphones, Watch, Laptop, LayoutGrid,
   Gamepad2, MoreHorizontal, ChevronRight
 } from 'lucide-react';
@@ -10,21 +10,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useProductStore } from '../store/productStore';
-import { useCategoryStore } from '../store/categoryStore';
 import { useBannerStore } from '../store/bannerStore';
 import { useAuthStore } from '../store/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const staticCategories = [
-  { id: '1', name: 'Electronics', image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80', items: '1,204' },
-  { id: '2', name: 'Furniture', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80', items: '840' },
-  { id: '3', name: 'Smart Watches', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80', items: '320' },
-  { id: '4', name: 'Photography', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&q=80', items: '150' },
-  { id: '5', name: 'Audio', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', items: '420' },
-  { id: '6', name: 'Gaming', image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500&q=80', items: '680' },
-  { id: '7', name: 'Home Appliances', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&q=80', items: '210' },
-  { id: '8', name: 'Accessories', image: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=500&q=80', items: '950' },
-];
+
 
 const customerReviews = [
   {
@@ -65,7 +55,6 @@ const Home: React.FC = () => {
   const addItem = useCartStore((state) => state.addItem);
   const { toggleItem, isInWishlist } = useWishlistStore();
   const products = useProductStore((state) => state.products);
-  const { categories } = useCategoryStore();
   const { banners } = useBannerStore();
 
   // Quick View / 3D Model Modal States
@@ -177,7 +166,6 @@ const Home: React.FC = () => {
   const [showAllFlash, setShowAllFlash] = React.useState(false);
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [currentPromoSlide, setCurrentPromoSlide] = React.useState(0);
-  const categoryScrollRef = React.useRef<HTMLDivElement>(null);
 
 
 
@@ -322,25 +310,7 @@ const Home: React.FC = () => {
     return false;
   }, []);
 
-  const displayCategories = categories.length > 0 ? categories.slice(0, 8).map((c, i) => {
-    const images = [
-      'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80',
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80',
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
-      'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500&q=80',
-      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80',
-      'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&q=80',
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&q=80',
-      'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=500&q=80'
-    ];
-    const matchCount = products.filter(p => isMatchCategory(p, c.name)).length;
-    return {
-      id: c.id,
-      name: c.name,
-      image: images[i % images.length],
-      items: matchCount > 0 ? `${matchCount}+` : '15+'
-    };
-  }) : staticCategories;
+
 
   // Filtered showcase products
   const categoryTabNames = ['All', 'Audio', 'Smart Watches', 'Gaming', 'Electronics', 'Furniture', 'Photography'];
@@ -563,7 +533,7 @@ const Home: React.FC = () => {
           <motion.div
             key={`bg-${currentSlide}`}
             initial={{ scale: 1.08, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.25 }}
+            animate={{ scale: 1, opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
             className="absolute inset-0 z-0 w-full h-full"
@@ -571,13 +541,13 @@ const Home: React.FC = () => {
             <img
               src={heroBanner.image}
               alt="Hero Background"
-              className="w-full h-full object-cover object-center mix-blend-multiply"
+              className="w-full h-full object-cover object-center"
             />
           </motion.div>
         </AnimatePresence>
 
         {/* Mobile Gradient Overlay for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-ice-blue via-ice-blue/90 to-transparent z-0 pointer-events-none md:via-ice-blue/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-white/20 to-transparent z-0 pointer-events-none"></div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center h-full pt-10 pb-16 md:py-0">
           <AnimatePresence mode="wait">
@@ -647,108 +617,50 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Categories Carousel Section */}
-      <section className="py-14 sm:py-24 container mx-auto px-4 sm:px-6 lg:px-8 hidden sm:block">
-        <div className="mb-8 sm:mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-sapphire/10 text-sapphire text-xs font-black uppercase tracking-widest mb-2.5 border border-sapphire/20 shadow-xs">
-            <Layers size={13} /> Featured Departments
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
-            Shop by <span className="text-transparent bg-clip-text bg-gradient-to-r from-sapphire via-blue-600 to-cyan-500">Category</span>
-          </h2>
-          <p className="text-gray-500/90 text-sm sm:text-base mt-2 font-medium max-w-xl">
-            Explore curated departments designed for your modern lifestyle.
-          </p>
-        </div>
 
-        <div
-          ref={categoryScrollRef}
-          className="flex overflow-x-auto gap-4 sm:gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] after:content-[''] after:w-1 after:shrink-0 sm:after:hidden"
-        >
-          {displayCategories.map((category, index) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.06 }}
-              className="w-[220px] sm:w-[270px] lg:w-[310px] shrink-0 snap-center sm:snap-start"
-            >
-              <Link
-                to={`/products?category=${encodeURIComponent(category.name)}`}
-                className="group relative rounded-3xl overflow-hidden aspect-[4/5] shadow-xl shadow-gray-200/70 block w-full h-full bg-gray-950 border border-gray-100/80 transition-transform duration-500 hover:-translate-y-1"
-              >
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-out"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent opacity-95 group-hover:opacity-85 transition-opacity duration-500"></div>
-
-                <div className="absolute inset-0 p-5 sm:p-7 flex flex-col justify-end z-20">
-                  <h3 className="text-xl sm:text-2xl font-black text-white mb-2 drop-shadow-md translate-y-1 group-hover:translate-y-0 transition-transform duration-500">{category.name}</h3>
-
-                  <div className="flex items-center justify-between opacity-100 sm:opacity-90 sm:translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 pt-1 gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white border border-white/25 text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase group-hover:bg-sapphire group-hover:border-sapphire group-hover:text-white transition-all duration-300 shadow-md whitespace-nowrap shrink-0">
-                      <span className="hidden sm:inline">Explore Department</span>
-                      <span className="sm:hidden">Explore</span>
-                      <ArrowRight size={12} className="stroke-[2.5]" />
-                    </span>
-
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white text-gray-900 flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500 shadow-lg shrink-0">
-                      <ArrowRight size={14} className="stroke-[3]" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
       {/* Flash Sale Section */}
-      <section className="py-12 sm:py-20 bg-gradient-to-br from-deep-navy via-sapphire to-blue-700 text-white relative overflow-hidden">
+      <section className="py-8 sm:py-14 bg-gradient-to-br from-deep-navy via-sapphire to-blue-700 text-white relative overflow-hidden">
         {/* Glow Blobs */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400 opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Section Header & Timer */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sm:mb-10 gap-5">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4">
             <div>
-              <div className="flex items-center gap-2.5 mb-2">
-                <span className="bg-red-500 text-white px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider animate-pulse flex items-center gap-1">
-                  <Zap size={12} className="fill-current" /> Live Flash Sale
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="bg-red-500 text-white px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider animate-pulse flex items-center gap-1">
+                  <Zap size={11} className="fill-current" /> Live Flash Sale
                 </span>
                 {isSuperAdmin && (
                   <span className="text-blue-200 text-xs font-semibold">({flashSaleProducts.length} deals active)</span>
                 )}
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">Limited-Time Discounts</h2>
-              <p className="text-blue-100/90 text-sm sm:text-base mt-1 max-w-lg font-medium">Up to 50% OFF on high-demand electronics and premium accessories.</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">Limited-Time Discounts</h2>
+              <p className="text-blue-100/90 text-xs sm:text-sm mt-0.5 max-w-lg font-medium">Up to 50% OFF on high-demand electronics and premium accessories.</p>
             </div>
 
             {/* Advanced Metallic Glass Countdown Timer Box */}
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 bg-gradient-to-r from-white/20 via-white/10 to-white/20 backdrop-blur-xl p-2.5 sm:p-3.5 rounded-2xl sm:rounded-3xl border border-white/30 shadow-2xl shadow-cyan-950/40">
-              <span className="text-xs sm:text-sm font-black uppercase text-cyan-200 tracking-wider px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center gap-1.5 shadow-xs">
-                <Clock size={14} className="text-cyan-300 animate-spin" />
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-gradient-to-r from-white/20 via-white/10 to-white/20 backdrop-blur-xl p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border border-white/30 shadow-2xl shadow-cyan-950/40">
+              <span className="text-[11px] sm:text-xs font-black uppercase text-cyan-200 tracking-wider px-2 py-1 rounded-md bg-cyan-500/20 border border-cyan-400/40 flex items-center gap-1 shadow-xs">
+                <Clock size={13} className="text-cyan-300" />
                 <span>ENDS IN:</span>
               </span>
 
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {[
                   { v: timeLeft.hours, l: 'HRS' },
                   { v: timeLeft.minutes, l: 'MIN' },
                   { v: timeLeft.seconds, l: 'SEC' }
                 ].map((t, i) => (
                   <React.Fragment key={t.l}>
-                    {i > 0 && <span className="text-xl sm:text-2xl font-black text-cyan-300 animate-pulse">:</span>}
-                    <div className="bg-gradient-to-b from-white/25 via-white/15 to-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center min-w-[50px] sm:min-w-[62px] border border-white/40 shadow-inner group hover:scale-105 transition-transform duration-300">
-                      <span className="block text-lg sm:text-2xl font-black tabular-nums text-white drop-shadow-[0_2px_8px_rgba(34,211,238,0.5)]">
+                    {i > 0 && <span className="text-base sm:text-xl font-black text-cyan-300 animate-pulse">:</span>}
+                    <div className="bg-gradient-to-b from-white/25 via-white/15 to-white/10 backdrop-blur-md rounded-lg sm:rounded-xl p-1.5 sm:p-2 text-center min-w-[44px] sm:min-w-[54px] border border-white/40 shadow-inner group hover:scale-105 transition-transform duration-300">
+                      <span className="block text-base sm:text-xl font-black tabular-nums text-white drop-shadow-[0_2px_8px_rgba(34,211,238,0.5)]">
                         {String(t.v).padStart(2, '0')}
                       </span>
-                      <span className="text-[9px] sm:text-[10px] text-cyan-200 font-extrabold tracking-widest uppercase">
+                      <span className="text-[8px] sm:text-[9px] text-cyan-200 font-extrabold tracking-widest uppercase">
                         {t.l}
                       </span>
                     </div>
@@ -759,7 +671,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Flash Sale Product Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4.5">
             {flashSaleProducts.slice(0, showAllFlash ? 12 : 8).map((product, index) => (
               <motion.div
                 key={product.id}
@@ -767,12 +679,12 @@ const Home: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white text-gray-900 rounded-2xl sm:rounded-3xl shadow-md hover:shadow-xl overflow-hidden group relative flex flex-col h-full border border-gray-100/90 transition-all duration-300"
+                className="bg-white text-gray-900 rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl overflow-hidden group relative flex flex-col h-full border border-gray-100/90 transition-all duration-300"
               >
                 {/* Badges Stacked cleanly on top-left to avoid Wishlist button on top-right */}
-                <div className="absolute top-2.5 left-2.5 z-20 flex flex-col gap-1 items-start">
-                  <span className="bg-gradient-to-r from-red-500 to-rose-600 text-white px-2 py-0.5 sm:px-2.5 rounded-full font-black text-[9px] sm:text-[11px] shadow-md flex items-center gap-0.5">
-                    <Zap size={10} className="fill-current" /> -{product.discount}%
+                <div className="absolute top-2 left-2 z-20 flex flex-col gap-1 items-start">
+                  <span className="bg-gradient-to-r from-red-500 to-rose-600 text-white px-2 py-0.5 rounded-full font-black text-[9px] sm:text-[10px] shadow-md flex items-center gap-0.5">
+                    <Zap size={9} className="fill-current" /> -{product.discount}%
                   </span>
                   {product.stock <= 15 && (
                     <span className="bg-orange-500 text-white px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-extrabold shadow-sm">
@@ -788,16 +700,16 @@ const Home: React.FC = () => {
                     toggleItem({ ...product, id: product.id.toString(), price: product.price, oldPrice: product.oldPrice, rating: product.rating, category: product.category });
                   }}
                   aria-label="Wishlist"
-                  className={`absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-md cursor-pointer ${isInWishlist(product.id.toString())
+                  className={`absolute top-2 right-2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-md cursor-pointer ${isInWishlist(product.id.toString())
                       ? 'bg-pink-50 text-pink-500 border border-pink-200'
                       : 'bg-white/90 text-gray-400 hover:text-pink-500 hover:scale-105 border border-gray-200'
                     }`}
                 >
-                  <Heart size={14} className={isInWishlist(product.id.toString()) ? 'fill-current scale-110' : ''} />
+                  <Heart size={13} className={isInWishlist(product.id.toString()) ? 'fill-current scale-110' : ''} />
                 </button>
 
                 {/* Product Image Container with safe fallback */}
-                <div className="relative aspect-square w-full overflow-hidden bg-gray-100 group">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 group">
                   <img
                     src={product.image}
                     alt=""
@@ -808,19 +720,19 @@ const Home: React.FC = () => {
                   />
 
                   {/* Interactive Quick View / 3D Model Trigger Overlay */}
-                  <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-3">
+                  <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2.5">
                     <button
                       onClick={(e) => openQuickView(e, product)}
-                      className="bg-white/95 text-gray-900 font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[10px] sm:text-xs shadow-xl hover:bg-sapphire hover:text-white transition-all flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 cursor-pointer"
+                      className="bg-white/95 text-gray-900 font-bold px-3 py-1.5 rounded-xl text-[10px] sm:text-xs shadow-xl hover:bg-sapphire hover:text-white transition-all flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 cursor-pointer"
                     >
-                      <Box size={14} className="text-sapphire group-hover:text-white" />
+                      <Box size={13} className="text-sapphire group-hover:text-white" />
                       <span>Interactive 3D View</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Product Details */}
-                <div className="p-2.5 sm:p-4 flex flex-col flex-1 bg-white">
+                <div className="p-2.5 sm:p-3 flex flex-col flex-1 bg-white">
                   <div className="flex items-center gap-1 mb-1">
                     <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded text-amber-800">
                       <Star className="fill-amber-400 text-amber-400" size={10} />
@@ -830,14 +742,14 @@ const Home: React.FC = () => {
                   </div>
 
                   <Link to={`/products/${product.id}`}>
-                    <h3 className="font-bold text-gray-900 mb-1.5 sm:mb-2 hover:text-sapphire transition-colors line-clamp-2 text-[12px] sm:text-sm leading-snug min-h-[2.1rem] sm:min-h-[2.5rem]">
+                    <h3 className="font-bold text-gray-900 mb-1 sm:mb-1.5 hover:text-sapphire transition-colors line-clamp-2 text-[12px] sm:text-sm leading-snug min-h-[1.9rem] sm:min-h-[2.2rem]">
                       {product.name}
                     </h3>
                   </Link>
 
-                  <div className="mt-auto space-y-2.5 sm:space-y-3 pt-1">
+                  <div className="mt-auto space-y-2 sm:space-y-2.5 pt-1">
                     <div className="flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
-                      <span className="font-black text-sm sm:text-xl text-gray-900">${product.price.toFixed(2)}</span>
+                      <span className="font-black text-sm sm:text-lg text-gray-900">${product.price.toFixed(2)}</span>
                       {product.oldPrice && (
                         <span className="text-[9px] sm:text-xs text-gray-400 line-through font-medium">
                           ${product.oldPrice.toFixed(2)}
@@ -849,30 +761,30 @@ const Home: React.FC = () => {
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <button
                         onClick={(e) => handleQuickOrder(e, product)}
-                        className="flex-1 bg-gray-900 text-white py-2 sm:py-2.5 px-2 rounded-xl font-extrabold text-[11px] sm:text-xs flex items-center justify-center gap-1 hover:bg-sapphire transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                        className="flex-1 bg-gray-900 text-white py-1.5 sm:py-2 px-2 rounded-xl font-extrabold text-[10px] sm:text-[11px] flex items-center justify-center gap-1 hover:bg-sapphire transition-all shadow-xs cursor-pointer whitespace-nowrap"
                       >
-                        <Zap size={13} className="fill-current" />
+                        <Zap size={12} className="fill-current" />
                         <span>Quick Order</span>
                       </button>
 
                       <button
                         onClick={(e) => handleQuickAdd(e, product)}
-                        className="w-8.5 h-8.5 sm:w-10 sm:h-10 shrink-0 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-sapphire text-gray-700 hover:text-sapphire flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+                        className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-sapphire text-gray-700 hover:text-sapphire flex items-center justify-center transition-all cursor-pointer shadow-2xs"
                         title="Add to Cart"
                       >
-                        <ShoppingCart size={15} />
+                        <ShoppingCart size={14} />
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Stock Progress Bar */}
-                <div className="px-2.5 pb-2.5 sm:px-4 sm:pb-4 bg-white rounded-b-2xl sm:rounded-b-3xl border-t border-gray-50 pt-1.5">
-                  <div className="flex justify-between text-[8px] sm:text-[9px] font-bold text-gray-400 mb-1 uppercase tracking-wider">
+                <div className="px-2.5 pb-2 sm:px-3 sm:pb-2.5 bg-white rounded-b-xl sm:rounded-b-2xl border-t border-gray-50 pt-1">
+                  <div className="flex justify-between text-[8px] sm:text-[9px] font-bold text-gray-400 mb-0.5 uppercase tracking-wider">
                     <span>Stock</span>
                     <span className="text-orange-500">{product.stock} left</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1 sm:h-1.5 overflow-hidden">
+                  <div className="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
                     <div
                       className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 h-full rounded-full"
                       style={{ width: `${Math.max(15, Math.min(90, 100 - (product.stock / 150) * 100))}%` }}
@@ -884,20 +796,20 @@ const Home: React.FC = () => {
           </div>
 
           {/* Flash Sale CTA */}
-          <div className="text-center mt-10">
+          <div className="text-center mt-6 sm:mt-8">
             {!showAllFlash ? (
               <button
                 onClick={() => setShowAllFlash(true)}
-                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/25 text-white font-bold px-7 py-3 rounded-2xl hover:bg-white/20 transition-all text-sm cursor-pointer shadow-lg"
+                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/25 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-white/20 transition-all text-xs sm:text-sm cursor-pointer shadow-lg"
               >
                 View More Flash Deals ({flashSaleProducts.length - 8} items left)
               </button>
             ) : (
               <Link
                 to="/sale"
-                className="inline-flex items-center gap-2 bg-white text-deep-navy font-black px-8 py-3.5 rounded-2xl hover:bg-blue-50 transition-all shadow-xl text-base hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 bg-white text-deep-navy font-black px-7 py-3 rounded-xl hover:bg-blue-50 transition-all shadow-xl text-sm sm:text-base hover:-translate-y-0.5"
               >
-                Explore Full Sale Page <ArrowRight size={18} />
+                Explore Full Sale Page <ArrowRight size={16} />
               </Link>
             )}
           </div>

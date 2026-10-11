@@ -15,45 +15,106 @@ interface CategoryStore {
   deleteCategory: (id: string) => void;
 }
 
-const initialCategories: Category[] = [
-  { id: '1', name: 'Electronics', slug: 'electronics', parent: '-' },
-  { id: '1a', name: 'Smart Watches', slug: 'smart-watches', parent: '-' },
-  { id: '1b', name: 'Audio', slug: 'audio', parent: '-' },
-  { id: '1c', name: 'Gaming', slug: 'gaming', parent: '-' },
-  { id: '1d', name: 'Laptops', slug: 'laptops', parent: 'Electronics' },
-  { id: '1e', name: 'Smartphones', slug: 'smartphones', parent: 'Electronics' },
-
-  { id: '2', name: 'Furniture', slug: 'furniture', parent: '-' },
-  { id: '2a', name: 'Living Room', slug: 'living-room', parent: 'Furniture' },
-  { id: '2b', name: 'Bedroom', slug: 'bedroom', parent: 'Furniture' },
-  { id: '2c', name: 'Office', slug: 'office', parent: 'Furniture' },
-
-  { id: '3', name: 'Photography', slug: 'photography', parent: '-' },
-  { id: '3a', name: 'Cameras', slug: 'cameras', parent: 'Photography' },
-  { id: '3b', name: 'Lenses', slug: 'lenses', parent: 'Photography' },
-  { id: '3c', name: 'Drones', slug: 'drones', parent: 'Photography' },
-  { id: '3d', name: 'Accessories', slug: 'photography-accessories', parent: 'Photography' },
-
-  { id: '4', name: 'Fashion', slug: 'fashion', parent: '-' },
-  { id: '4a', name: 'Apparel', slug: 'apparel', parent: 'Fashion' },
-  { id: '4b', name: 'Men', slug: 'men', parent: 'Fashion' },
-  { id: '4c', name: 'Women', slug: 'women', parent: 'Fashion' },
-  { id: '4d', name: 'Bags & Backpacks', slug: 'bags', parent: 'Fashion' },
-  { id: '4e', name: 'Watches', slug: 'watches', parent: 'Fashion' },
-  { id: '4f', name: 'Jewelry', slug: 'jewelry', parent: 'Fashion' },
-
-  { id: '5', name: 'Home & Kitchen', slug: 'home', parent: '-' },
-  { id: '5a', name: 'Decor', slug: 'decor', parent: 'Home & Kitchen' },
-  { id: '5b', name: 'Appliances', slug: 'appliances', parent: 'Home & Kitchen' },
-
-  { id: '6', name: 'Sports & Fitness', slug: 'sports', parent: '-' },
-  { id: '6a', name: 'Workout Gear', slug: 'workout-gear', parent: 'Sports & Fitness' },
-  { id: '6b', name: 'Outdoor', slug: 'outdoor', parent: 'Sports & Fitness' },
-
-  { id: '8', name: 'Beauty', slug: 'beauty', parent: '-' },
-  { id: '8a', name: 'Skincare', slug: 'skincare', parent: 'Beauty' },
-  { id: '8b', name: 'Fragrance', slug: 'fragrance', parent: 'Beauty' },
+const rawCategoriesData: { name: string; subs: string[] }[] = [
+  {
+    name: 'Audio',
+    subs: ['Audio Accessories', 'Earbuds', 'Headphones', 'Home Audio Systems', 'Microphones', 'Soundbars', 'Speakers']
+  },
+  {
+    name: 'Automotive',
+    subs: ['Bike Accessories', 'Car Accessories', 'Car Care Products', 'Car Electronics', 'Riding Gear', 'Tyres & Accessories', 'Vehicle Cleaning']
+  },
+  {
+    name: 'Beauty & Personal Care',
+    subs: ['Beauty Tools', 'Fragrance', 'Hair Care', 'Makeup', 'Personal Care', 'Skincare']
+  },
+  {
+    name: 'Books & Stationery',
+    subs: ['Academic Books', 'Art & Craft Supplies', 'Educational Books', 'Fiction & Nonfiction', 'Notebooks & Diaries', 'Office Supplies', 'Pens & Pencils']
+  },
+  {
+    name: 'Electronics',
+    subs: ['Computer Accessories', 'Desktops & Monitors', 'Laptops', 'Networking', 'Printers & Accessories', 'Smartphones', 'Storage Devices', 'Tablets']
+  },
+  {
+    name: 'Fashion',
+    subs: ['Apparel', 'Bags & Backpacks', 'Fashion Accessories', 'Footwear', 'Kids', 'Men', 'Watches & Jewelry', 'Women']
+  },
+  {
+    name: 'Furniture',
+    subs: ['Bedroom', 'Dining Room', 'Living Room', 'Office Furniture', 'Outdoor Furniture', 'Storage Furniture']
+  },
+  {
+    name: 'Gaming',
+    subs: ['Gaming Accessories', 'Gaming Consoles', 'Gaming Monitors', 'Gaming PCs', 'Video Games', 'VR Headsets']
+  },
+  {
+    name: 'Garden & Outdoor',
+    subs: ['Garden Furniture', 'Gardening Tools', 'Outdoor Lighting', 'Planters & Pots', 'Seeds & Plants', 'Watering Equipment']
+  },
+  {
+    name: 'Gifts & Collectibles',
+    subs: ['Collectibles', 'Gift Sets', 'Greeting Cards', 'Hobby Kits', 'Personalized Gifts', 'Seasonal Gifts']
+  },
+  {
+    name: 'Grocery & Gourmet Food',
+    subs: ['Beverages', 'Breakfast Foods', 'Chocolates & Sweets', 'Cooking Essentials', 'Organic Foods', 'Packaged Foods', 'Snacks']
+  },
+  {
+    name: 'Health & Wellness',
+    subs: ['First Aid Supplies', 'Fitness & Recovery', 'Health Monitoring Devices', 'Massage Equipment', 'Personal Hygiene', 'Wellness Accessories']
+  },
+  {
+    name: 'Home & Kitchen',
+    subs: ['Cleaning Supplies', 'Cookware & Bakeware', 'Dining & Serveware', 'Home Appliances', 'Home Decor', 'Kitchen Appliances', 'Lighting', 'Storage & Organization']
+  },
+  {
+    name: 'Jewelry & Luxury',
+    subs: ['Fashion Jewelry', 'Gemstone Jewelry', 'Gold Jewelry', 'Jewelry Boxes', 'Luxury Watches', 'Silver Jewelry']
+  },
+  {
+    name: 'Pet Supplies',
+    subs: ['Aquariums & Accessories', 'Cat Supplies', 'Dog Supplies', 'Grooming Supplies', 'Pet Beds', 'Pet Food', 'Pet Toys']
+  },
+  {
+    name: 'Photography',
+    subs: ['Camera Accessories', 'Camera Lenses', 'Digital Cameras', 'Drones', 'Lighting Equipment', 'Tripods & Stabilizers']
+  },
+  {
+    name: 'Smart Watches & Wearables',
+    subs: ['Charging Accessories', 'Fitness Trackers', 'Smart Watches', 'Traditional Watches', 'Watch Straps']
+  },
+  {
+    name: 'Sports & Fitness',
+    subs: ['Cycling', 'Gym Equipment', 'Outdoor Recreation', 'Sportswear', 'Team Sports', 'Workout Gear', 'Yoga & Fitness']
+  },
+  {
+    name: 'Toys & Baby Products',
+    subs: ['Action Figures', 'Baby Care', 'Baby Clothing', 'Baby Feeding', 'Board Games', 'Dolls', 'Educational Toys', 'Outdoor Toys']
+  },
+  {
+    name: 'Travel & Luggage',
+    subs: ['Duffel Bags', 'Neck Pillows', 'Suitcases', 'Travel Accessories', 'Travel Backpacks', 'Travel Organizers']
+  }
 ];
+
+const initialCategories: Category[] = rawCategoriesData.flatMap((cat, idx) => {
+  const parentId = (idx + 1).toString();
+  const parentSlug = cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  const parentCat: Category = {
+    id: parentId,
+    name: cat.name,
+    slug: parentSlug,
+    parent: '-'
+  };
+  const subCats: Category[] = cat.subs.map((sub, sIdx) => ({
+    id: `${parentId}-${sIdx + 1}`,
+    name: sub,
+    slug: sub.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+    parent: cat.name
+  }));
+  return [parentCat, ...subCats];
+});
 
 export const useCategoryStore = create<CategoryStore>()(
   persist(
@@ -72,6 +133,6 @@ export const useCategoryStore = create<CategoryStore>()(
           categories: state.categories.filter((c) => c.id !== id),
         })),
     }),
-    { name: 'thebatstore-categories-storage-v3' }
+    { name: 'thebatstore-categories-storage-v5' }
   )
 );

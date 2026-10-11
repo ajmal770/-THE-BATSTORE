@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, Menu, Package, Heart, X, ChevronDown, ChevronRight, Home as HomeIcon, ShoppingBag, Tag, LogOut, Bell, Trash2, CheckCheck, LayoutGrid, Settings, ShieldCheck, ArrowRight, Zap, Laptop, Watch, Armchair, Camera, Headphones, Shirt, Gamepad2, Dumbbell, Flower2 } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, Package, Heart, X, ChevronDown, ChevronRight, Home as HomeIcon, ShoppingBag, Tag, LogOut, Bell, Trash2, CheckCheck, LayoutGrid, Settings, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../store/authStore';
 import { useCartStore } from '../../store/cartStore';
@@ -12,97 +12,80 @@ import type { NotificationCategory } from '../../store/notificationStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProductStore } from '../../store/productStore';
 
-// MEGA MENU COMPONENT FOR CATEGORIES
-const CategoriesDropdown: React.FC<{ isOpen: boolean, onClose: () => void, categories: any[] }> = ({ isOpen, onClose, categories }) => {
+import { MEGA_COLUMNS } from '../../constants/categoriesData';
+
+
+const CategoriesDropdown: React.FC<{ isOpen: boolean, onClose: () => void, categories?: any[] }> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const topCategories = categories.filter(c => c.parent === '-');
 
-  const getCategoryIcon = (name: string) => {
-    switch(name.toLowerCase()) {
-      case 'electronics': return { icon: <Laptop size={18} />, bg: 'bg-blue-100', color: 'text-blue-600' };
-      case 'smart watches': return { icon: <Watch size={18} />, bg: 'bg-orange-100', color: 'text-orange-600' };
-      case 'furniture': return { icon: <Armchair size={18} />, bg: 'bg-teal-100', color: 'text-teal-600' };
-      case 'photography': return { icon: <Camera size={18} />, bg: 'bg-purple-100', color: 'text-purple-600' };
-      case 'audio': return { icon: <Headphones size={18} />, bg: 'bg-red-100', color: 'text-red-600' };
-      case 'fashion': return { icon: <Shirt size={18} />, bg: 'bg-blue-100', color: 'text-blue-600' };
-      case 'home & kitchen': return { icon: <HomeIcon size={18} />, bg: 'bg-emerald-100', color: 'text-emerald-600' };
-      case 'gaming': return { icon: <Gamepad2 size={18} />, bg: 'bg-purple-100', color: 'text-purple-600' };
-      case 'sports & fitness': return { icon: <Dumbbell size={18} />, bg: 'bg-indigo-100', color: 'text-indigo-600' };
-      case 'beauty': return { icon: <Flower2 size={18} />, bg: 'bg-pink-100', color: 'text-pink-600' };
-      default: return { icon: <Package size={18} />, bg: 'bg-gray-100', color: 'text-gray-600' };
-    }
-  };
-
-  const handleCategoryClick = (name: string) => {
+  const handleCategoryClick = (categoryName: string, subcategoryName?: string) => {
     onClose();
-    navigate(`/products?category=${encodeURIComponent(name)}`);
+    if (subcategoryName) {
+      navigate(`/products?category=${encodeURIComponent(categoryName)}&subcategory=${encodeURIComponent(subcategoryName)}`);
+    } else {
+      navigate(`/products?category=${encodeURIComponent(categoryName)}`);
+    }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: 15, scale: 0.98 }}
+          initial={{ opacity: 0, y: 10, scale: 0.99 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 15, scale: 0.98 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[960px] bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 p-4 z-50"
+          exit={{ opacity: 0, y: 10, scale: 0.99 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[1140px] max-w-[calc(100vw-32px)] max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-2xl shadow-gray-900/12 border border-gray-100 z-50 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
         >
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
-            <div className="text-blue-600">
-              <LayoutGrid size={18} className="stroke-[2.5]" />
-            </div>
-            <h3 className="text-xs font-black text-[#0b1b3d] uppercase tracking-widest">
-              Departments
-            </h3>
-          </div>
-
-          {/* Categories Masonry Grid */}
-          <div className="columns-3 gap-x-3">
-            {topCategories.map((cat) => {
-              const subCats = categories.filter(sub => sub.parent === cat.name);
-              const { icon, bg, color } = getCategoryIcon(cat.name);
-              
-              return (
-                <div 
-                  key={cat.id} 
-                  className="bg-white border border-gray-100 rounded-lg p-2 cursor-pointer hover:border-sapphire/40 transition-all group break-inside-avoid mb-2.5"
-                  onClick={() => handleCategoryClick(cat.name)}
-                >
-                  <div className="flex items-start gap-2.5">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${bg} ${color}`}>
-                      {icon}
-                    </div>
-                    <div className="flex-1 min-w-0 pt-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-bold text-gray-900 text-[13px] group-hover:text-sapphire transition-colors truncate pr-2 leading-tight">
-                          {cat.name}
+          {/* 5-Column Mega Menu Body */}
+          <div className="grid grid-cols-5 divide-x divide-gray-100 p-6 bg-white">
+            {MEGA_COLUMNS.map((col, colIdx) => (
+              <div key={colIdx} className="px-5 first:pl-2 last:pr-2 space-y-6">
+                {col.sections.map((section, sIdx) => (
+                  <div 
+                    key={section.name} 
+                    className={`group/cat transition-all rounded-xl p-2 -mx-2 hover:bg-blue-50/50 ${sIdx > 0 ? "pt-5 border-t border-gray-100/80" : ""}`}
+                  >
+                    {/* Section Header with Blue Icon, Black Title & Hover Chevron */}
+                    <div
+                      onClick={() => handleCategoryClick(section.name)}
+                      className="flex items-center justify-between cursor-pointer py-0.5 group-hover/cat:text-sapphire transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="group-hover/cat:scale-110 transition-transform duration-200 flex-shrink-0 text-sapphire">
+                          {section.icon}
                         </span>
-                        <ChevronRight size={12} className="text-gray-300 group-hover:text-sapphire transition-colors shrink-0" />
+                        <span className="font-extrabold text-gray-900 text-[14px] tracking-tight group-hover/cat:text-sapphire transition-colors">
+                          {section.name}
+                        </span>
                       </div>
-                      
-                      {subCats.length > 0 && (
-                        <div className="hidden group-hover:flex flex-col gap-0.5 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-                          {subCats.map((sub) => (
-                            <button
-                              key={sub.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCategoryClick(sub.name);
-                              }}
-                              className="text-[11px] leading-tight text-gray-500 hover:text-sapphire text-left transition-colors font-medium truncate cursor-pointer py-0.5"
-                            >
-                              {sub.name}
-                            </button>
+                      <ChevronDown 
+                        size={13} 
+                        className="text-gray-400 group-hover/cat:text-sapphire group-hover/cat:rotate-180 transition-all duration-200 shrink-0" 
+                      />
+                    </div>
+
+                    {/* Subcategories Vertical List - Hidden by default, reveals when cursor points */}
+                    <div className="grid grid-rows-[0fr] opacity-0 group-hover/cat:grid-rows-[1fr] group-hover/cat:opacity-100 transition-all duration-250 ease-out">
+                      <div className="overflow-hidden">
+                        <ul className="space-y-1.5 pt-2 pb-1 pl-6 border-l-2 border-blue-200 ml-1">
+                          {section.subcategories.map((sub) => (
+                            <li key={sub}>
+                              <button
+                                onClick={() => handleCategoryClick(section.name, sub)}
+                                className="text-[13px] text-gray-800 hover:text-sapphire hover:font-semibold font-medium transition-all text-left block w-full hover:translate-x-0.5 cursor-pointer leading-relaxed"
+                              >
+                                {sub}
+                              </button>
+                            </li>
                           ))}
-                        </div>
-                      )}
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            ))}
           </div>
         </motion.div>
       )}
@@ -267,7 +250,7 @@ const SearchOverlay: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isO
 const MobileMenuDrawer: React.FC<{ isOpen: boolean, onClose: () => void, user: any, avatarUrl?: string | null, wishlistCount: number, cartCount: number, notifCount: number, categories: any[], handleLogout: () => void }> = ({ isOpen, onClose, user, avatarUrl, wishlistCount, cartCount, notifCount, categories, handleLogout }) => {
   const navigate = useNavigate();
   const [activeAccordion, setActiveAccordion] = useState(false);
-  const topCategories = categories.filter(c => c.parent === '-');
+  const topCategories = [...categories.filter(c => c.parent === '-')].sort((a, b) => a.name.localeCompare(b.name));
 
   const handleLinkClick = (path: string) => {
     onClose();

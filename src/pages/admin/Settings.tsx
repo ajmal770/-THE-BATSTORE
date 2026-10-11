@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle, Bookmark } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle } from 'lucide-react';
 import { useSettingsStore, type Settings as SettingsType } from '../../store/settingsStore';
 
 type Tab = 'general' | 'shipping' | 'tax' | 'seo';

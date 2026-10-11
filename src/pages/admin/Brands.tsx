@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Tag, Plus, Search, Edit2, Trash2, X, Bookmark } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Bookmark } from 'lucide-react';
 import { useBrandStore } from '../../store/brandStore';
 import type { Brand } from '../../store/brandStore';
 import { useProductStore } from '../../store/productStore';
 import { useAuthStore } from '../../store/authStore';
-import { TextInput } from '../../components/TextInput';
+
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Brands: React.FC = () => {

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Star, ChevronDown, Heart, Search, LayoutGrid, List as ListIcon, X, SlidersHorizontal, ChevronRight, Check, ShoppingCart, Eye, Zap, Sparkles, Cpu, Headphones, Watch, ChevronLeft } from 'lucide-react';
+import { Star, ChevronDown, Heart, Search, LayoutGrid, List as ListIcon, X, SlidersHorizontal, ChevronRight, Check, ShoppingCart, Eye, Zap, ChevronLeft } from 'lucide-react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { SEO } from '../components/SEO';
 import { useCartStore } from '../store/cartStore';
@@ -8,13 +8,26 @@ import { useProductStore } from '../store/productStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HIERARCHY = [
-  { name: 'Electronics', subs: ['Smartphones', 'Laptops', 'Smart Watches', 'Audio & Sound'] },
-  { name: 'Furniture', subs: ['Living Room', 'Bedroom', 'Office'] },
-  { name: 'Photography', subs: ['Cameras', 'Lenses', 'Drones', 'Accessories'] },
-  { name: 'Fashion', subs: ['Apparel', 'Men', 'Women', 'Bags & Backpacks', 'Watches', 'Jewelry'] },
-  { name: 'Home & Kitchen', subs: ['Decor', 'Appliances'] },
-  { name: 'Sports & Fitness', subs: ['Workout Gear', 'Outdoor'] },
-  { name: 'Beauty', subs: ['Skincare', 'Fragrance'] }
+  { name: 'Audio', subs: ['Audio Accessories', 'Earbuds', 'Headphones', 'Home Audio Systems', 'Microphones', 'Soundbars', 'Speakers'] },
+  { name: 'Automotive', subs: ['Bike Accessories', 'Car Accessories', 'Car Care Products', 'Car Electronics', 'Riding Gear', 'Tyres & Accessories', 'Vehicle Cleaning'] },
+  { name: 'Beauty & Personal Care', subs: ['Beauty Tools', 'Fragrance', 'Hair Care', 'Makeup', 'Personal Care', 'Skincare'] },
+  { name: 'Books & Stationery', subs: ['Academic Books', 'Art & Craft Supplies', 'Educational Books', 'Fiction & Nonfiction', 'Notebooks & Diaries', 'Office Supplies', 'Pens & Pencils'] },
+  { name: 'Electronics', subs: ['Computer Accessories', 'Desktops & Monitors', 'Laptops', 'Networking', 'Printers & Accessories', 'Smartphones', 'Storage Devices', 'Tablets'] },
+  { name: 'Fashion', subs: ['Apparel', 'Bags & Backpacks', 'Fashion Accessories', 'Footwear', 'Kids', 'Men', 'Watches & Jewelry', 'Women'] },
+  { name: 'Furniture', subs: ['Bedroom', 'Dining Room', 'Living Room', 'Office Furniture', 'Outdoor Furniture', 'Storage Furniture'] },
+  { name: 'Gaming', subs: ['Gaming Accessories', 'Gaming Consoles', 'Gaming Monitors', 'Gaming PCs', 'Video Games', 'VR Headsets'] },
+  { name: 'Garden & Outdoor', subs: ['Garden Furniture', 'Gardening Tools', 'Outdoor Lighting', 'Planters & Pots', 'Seeds & Plants', 'Watering Equipment'] },
+  { name: 'Gifts & Collectibles', subs: ['Collectibles', 'Gift Sets', 'Greeting Cards', 'Hobby Kits', 'Personalized Gifts', 'Seasonal Gifts'] },
+  { name: 'Grocery & Gourmet Food', subs: ['Beverages', 'Breakfast Foods', 'Chocolates & Sweets', 'Cooking Essentials', 'Organic Foods', 'Packaged Foods', 'Snacks'] },
+  { name: 'Health & Wellness', subs: ['First Aid Supplies', 'Fitness & Recovery', 'Health Monitoring Devices', 'Massage Equipment', 'Personal Hygiene', 'Wellness Accessories'] },
+  { name: 'Home & Kitchen', subs: ['Cleaning Supplies', 'Cookware & Bakeware', 'Dining & Serveware', 'Home Appliances', 'Home Decor', 'Kitchen Appliances', 'Lighting', 'Storage & Organization'] },
+  { name: 'Jewelry & Luxury', subs: ['Fashion Jewelry', 'Gemstone Jewelry', 'Gold Jewelry', 'Jewelry Boxes', 'Luxury Watches', 'Silver Jewelry'] },
+  { name: 'Pet Supplies', subs: ['Aquariums & Accessories', 'Cat Supplies', 'Dog Supplies', 'Grooming Supplies', 'Pet Beds', 'Pet Food', 'Pet Toys'] },
+  { name: 'Photography', subs: ['Camera Accessories', 'Camera Lenses', 'Digital Cameras', 'Drones', 'Lighting Equipment', 'Tripods & Stabilizers'] },
+  { name: 'Smart Watches & Wearables', subs: ['Charging Accessories', 'Fitness Trackers', 'Smart Watches', 'Traditional Watches', 'Watch Straps'] },
+  { name: 'Sports & Fitness', subs: ['Cycling', 'Gym Equipment', 'Outdoor Recreation', 'Sportswear', 'Team Sports', 'Workout Gear', 'Yoga & Fitness'] },
+  { name: 'Toys & Baby Products', subs: ['Action Figures', 'Baby Care', 'Baby Clothing', 'Baby Feeding', 'Board Games', 'Dolls', 'Educational Toys', 'Outdoor Toys'] },
+  { name: 'Travel & Luggage', subs: ['Duffel Bags', 'Neck Pillows', 'Suitcases', 'Travel Accessories', 'Travel Backpacks', 'Travel Organizers'] }
 ];
 
 const COLORS = ['Black', 'White', 'Silver', 'Gold', 'Blue', 'Red', 'Green', 'Pink'];
@@ -54,26 +67,40 @@ const ProductList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
 
-  // Sync category param
+  // Sync category & subcategory params
   useEffect(() => {
-    if (initialCategory) {
-      // Check if it's a subcategory
-      const parentCat = HIERARCHY.find(c => c.subs.includes(initialCategory));
-      
+    const catParam = searchParams.get('category');
+    const subParam = searchParams.get('subcategory');
+
+    if (catParam) {
+      const parentCat = HIERARCHY.find(c => c.name.toLowerCase() === catParam.toLowerCase() || c.subs.some(s => s.toLowerCase() === catParam.toLowerCase()));
       if (parentCat) {
-        setSelectedCategory(parentCat.name);
-        setSelectedSubcategory(initialCategory);
-        if (!expandedCategories.includes(parentCat.name)) {
-          setExpandedCategories([...expandedCategories, parentCat.name]);
+        if (parentCat.name.toLowerCase() === catParam.toLowerCase()) {
+          setSelectedCategory(parentCat.name);
+          setSelectedSubcategory(subParam || null);
+          setExpandedCategories(prev => prev.includes(parentCat.name) ? prev : [...prev, parentCat.name]);
+        } else {
+          // catParam is actually a subcategory
+          setSelectedCategory(parentCat.name);
+          setSelectedSubcategory(catParam);
+          setExpandedCategories(prev => prev.includes(parentCat.name) ? prev : [...prev, parentCat.name]);
         }
       } else {
-        setSelectedCategory(initialCategory);
-        if (!expandedCategories.includes(initialCategory)) {
-          setExpandedCategories([...expandedCategories, initialCategory]);
-        }
+        setSelectedCategory(catParam);
+        setSelectedSubcategory(subParam || null);
       }
+    } else if (subParam) {
+      const parentCat = HIERARCHY.find(c => c.subs.some(s => s.toLowerCase() === subParam.toLowerCase()));
+      if (parentCat) {
+        setSelectedCategory(parentCat.name);
+        setSelectedSubcategory(subParam);
+        setExpandedCategories(prev => prev.includes(parentCat.name) ? prev : [...prev, parentCat.name]);
+      }
+    } else {
+      setSelectedCategory(null);
+      setSelectedSubcategory(null);
     }
-  }, [initialCategory]);
+  }, [searchParams]);
 
   const toggleCategoryAccordion = (cat: string) => {
     setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -328,76 +355,7 @@ const ProductList: React.FC = () => {
               </p>
             </div>
 
-            {/* Right Side Floating Animated Electronics Showcase Card */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              whileHover={{ scale: 1.03, y: -2 }}
-              transition={{ duration: 0.4 }}
-              className="hidden sm:block shrink-0 mt-3 lg:mt-0 cursor-pointer group"
-            >
-              <div className="bg-gradient-to-r from-slate-950 via-deep-navy to-slate-900 border border-cyan-400/40 group-hover:border-cyan-300 rounded-3xl p-4 sm:p-5 shadow-2xl shadow-cyan-950/40 relative overflow-hidden flex items-center gap-4.5 max-w-md transition-colors duration-500">
-                {/* Vibrant Glow Blobs */}
-                <div className="absolute top-0 right-0 w-36 h-36 bg-cyan-400/20 blur-2xl rounded-full pointer-events-none group-hover:bg-cyan-400/30 transition-all duration-500"></div>
-                <div className="absolute bottom-0 left-0 w-36 h-36 bg-sapphire/30 blur-2xl rounded-full pointer-events-none group-hover:bg-sapphire/45 transition-all duration-500"></div>
 
-                {/* Animated Floating Electronics Icons Stack */}
-                <div className="relative flex items-center gap-2.5 shrink-0">
-                  {/* Central CPU Icon Box with Pulse Aura */}
-                  <motion.div 
-                    animate={{ y: [0, -6, 0], rotate: [0, 2, -2, 0] }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-                    className="relative"
-                  >
-                    <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-400 to-sapphire opacity-75 blur-sm animate-pulse"></div>
-                    <div className="relative w-13 h-13 rounded-2xl bg-gradient-to-br from-sapphire via-blue-600 to-cyan-400 text-white flex items-center justify-center shadow-xl border border-white/30">
-                      <Cpu size={26} className="stroke-[2.5] drop-shadow-md" />
-                    </div>
-                  </motion.div>
-                  
-                  {/* Side Orbit Icons */}
-                  <div className="flex flex-col gap-2">
-                    <motion.div 
-                      animate={{ y: [0, 5, 0], scale: [1, 1.08, 1] }}
-                      transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut', delay: 0.1 }}
-                      className="w-8.5 h-8.5 rounded-xl bg-cyan-500/20 backdrop-blur-md border border-cyan-400/50 text-cyan-300 flex items-center justify-center shadow-md shadow-cyan-500/20"
-                    >
-                      <Headphones size={17} className="stroke-[2.5]" />
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ y: [0, -5, 0], scale: [1, 1.08, 1] }}
-                      transition={{ repeat: Infinity, duration: 3.2, ease: 'easeInOut', delay: 0.4 }}
-                      className="w-8.5 h-8.5 rounded-xl bg-amber-500/20 backdrop-blur-md border border-amber-400/50 text-amber-300 flex items-center justify-center shadow-md shadow-amber-500/20"
-                    >
-                      <Watch size={17} className="stroke-[2.5]" />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Tech Badge & Text Content */}
-                <div className="relative z-10">
-                  {/* Glowing Live Electronics Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/20 to-sapphire/30 border border-cyan-400/60 text-cyan-300 text-[10px] font-black uppercase tracking-widest mb-1.5 shadow-md shadow-cyan-500/20">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
-                    </span>
-                    Live Electronics
-                  </div>
-
-                  <h4 className="text-sm sm:text-base font-black text-white tracking-tight group-hover:text-cyan-200 transition-colors drop-shadow-md">
-                    Smart Electronics Showcase
-                  </h4>
-
-                  <p className="text-[11px] text-gray-300 mt-0.5 font-bold flex items-center gap-1.5">
-                    <span className="text-cyan-300 font-extrabold">{filteredProducts.length} items</span>
-                    <span className="text-gray-400 font-medium">verified in stock</span>
-                    <Sparkles size={13} className="text-amber-400 animate-[spin_6s_linear_infinite]" />
-                  </p>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
