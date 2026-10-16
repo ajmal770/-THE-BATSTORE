@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useNotificationStore } from './notificationStore';
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'CUSTOMER';
 
@@ -97,17 +98,43 @@ export const useAuthStore = create<AuthState>()(
           role: newUser.role || 'CUSTOMER',
         };
 
+        // Emit real-time welcome notification
+        useNotificationStore.getState().addNotification({
+          category: 'account',
+          title: 'Welcome to The BatStore! 🎉',
+          message: `Hello ${newUser.displayName || 'there'}, your account has been created. Start exploring our exclusive collections!`,
+          link: '/profile',
+        });
+
         set({ registeredUsers: [...state.registeredUsers, createdUser] });
         return { success: true, user: createdUser };
       },
-      updateUser: (uid, data) => 
+      updateUser: (uid, data) => {
+        // Emit live security/profile notifications if appropriate
+        if (data.password) {
+          useNotificationStore.getState().addNotification({
+            category: 'account',
+            title: 'Password Changed 🔐',
+            message: 'Your account password has been updated. If this was not you, please contact support.',
+            link: '/profile',
+          });
+        } else if (data.displayName || data.phone || data.shippingAddress || data.billingAddress) {
+          useNotificationStore.getState().addNotification({
+            category: 'account',
+            title: 'Profile Updated 👤',
+            message: 'Your account details have been updated successfully.',
+            link: '/profile',
+          });
+        }
+
         set((state) => ({
           registeredUsers: state.registeredUsers.map(u => 
             u.uid === uid ? { ...u, ...data } : u
           ),
           // Also update the current active user if they are the one being updated
           user: state.user?.uid === uid ? { ...state.user, displayName: data.displayName || state.user.displayName } : state.user
-        })),
+        }));
+      },
       deleteUser: (uid) =>
         set((state) => ({
           registeredUsers: state.registeredUsers.filter((u) => u.uid !== uid),

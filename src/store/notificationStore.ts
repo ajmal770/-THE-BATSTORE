@@ -10,6 +10,7 @@ export type AppNotification = {
   message: string;
   timestamp: string;
   isRead: boolean;
+  link?: string;
   icon?: string;
 };
 
@@ -23,82 +24,18 @@ type NotificationStore = {
   unreadCount: () => number;
 };
 
-const defaultNotifications: AppNotification[] = [
-  {
-    id: 'notif-1',
-    category: 'order',
-    title: 'Order Shipped! 🚚',
-    message: 'Your order ORD-2026-765 has been shipped and is on its way. Estimated delivery in 2-3 days.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    isRead: false,
-  },
-  {
-    id: 'notif-2',
-    category: 'order',
-    title: 'Order Delivered ✅',
-    message: 'Your order ORD-2026-982 (Smart Thermostat) has been delivered. We hope you love it!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    isRead: false,
-  },
-  {
-    id: 'notif-3',
-    category: 'promo',
-    title: 'Flash Sale – 40% Off! 🔥',
-    message: "Our biggest summer sale is live for the next 24 hours. Don't miss out on incredible deals.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    isRead: false,
-  },
-  {
-    id: 'notif-4',
-    category: 'account',
-    title: 'Profile Updated 👤',
-    message: "Your profile information has been updated successfully. If this wasn't you, please secure your account.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    isRead: true,
-  },
-  {
-    id: 'notif-5',
-    category: 'account',
-    title: 'New Sign-In Detected 🔐',
-    message: 'A new sign-in was detected from Windows, Chrome. If this was you, no action is needed.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-    isRead: true,
-  },
-  {
-    id: 'notif-6',
-    category: 'promo',
-    title: 'Exclusive Member Reward 🎁',
-    message: "As a valued member, you've earned 50 bonus loyalty points. Redeem them on your next order.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    isRead: true,
-  },
-  {
-    id: 'notif-7',
-    category: 'system',
-    title: 'App Update Available 🛠️',
-    message: "We've made improvements to search, checkout, and performance. Refresh to get the latest version.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-    isRead: true,
-  },
-  {
-    id: 'notif-8',
-    category: 'system',
-    title: 'Scheduled Maintenance 🔧',
-    message: 'Our platform will undergo a brief maintenance window on July 22 from 2:00–3:00 AM. Service may be temporarily unavailable.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(),
-    isRead: true,
-  },
-];
+// Clean real-world initial state: 0 dummy data
+const initialNotifications: AppNotification[] = [];
 
 export const useNotificationStore = create<NotificationStore>()(
   persist(
     (set, get) => ({
-      notifications: defaultNotifications,
+      notifications: initialNotifications,
 
       addNotification: (n) => {
         const newNotif: AppNotification = {
           ...n,
-          id: `notif-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          id: `live-notif-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           isRead: false,
           timestamp: new Date().toISOString(),
         };
@@ -133,6 +70,28 @@ export const useNotificationStore = create<NotificationStore>()(
         return get().notifications.filter((n) => !n.isRead).length;
       },
     }),
-    { name: 'thebatstore-notifications' }
+    {
+      name: 'thebatstore-notifications-v2',
+      onRehydrateStorage: () => (state) => {
+        if (state && Array.isArray(state.notifications)) {
+          // Remove any legacy dummy test notifications
+          state.notifications = state.notifications.filter(
+            (n) => !['notif-1', 'notif-2', 'notif-3', 'notif-4', 'notif-5', 'notif-6', 'notif-7', 'notif-8'].includes(n.id)
+          );
+        }
+      },
+    }
   )
 );
+
+// Clear legacy dummy storage item if present on client
+if (typeof window !== 'undefined') {
+  try {
+    const legacy = localStorage.getItem('thebatstore-notifications');
+    if (legacy && legacy.includes('notif-1')) {
+      localStorage.removeItem('thebatstore-notifications');
+    }
+  } catch {
+    // Ignore storage access errors
+  }
+}

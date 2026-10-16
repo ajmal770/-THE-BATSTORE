@@ -11,6 +11,7 @@ import { useOrderStore } from '../store/orderStore';
 import { useCustomerStore } from '../store/customerStore';
 import { useCouponStore } from '../store/couponStore';
 import { useAuthStore } from '../store/authStore';
+import { useNotificationStore } from '../store/notificationStore';
 
 const checkoutSchema = z.object({
   firstName: z.string().min(2, 'First name is required'),
@@ -103,6 +104,11 @@ const Checkout: React.FC = () => {
 
     applyCoupon(foundCoupon);
     setCouponSuccess(`Coupon "${foundCoupon.code}" applied successfully!`);
+    useNotificationStore.getState().addNotification({
+      category: 'promo',
+      title: `Coupon Applied: ${foundCoupon.code} 🎟️`,
+      message: `You unlocked savings with coupon "${foundCoupon.code}" on your active checkout!`,
+    });
     setCouponInput('');
   };
 

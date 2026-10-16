@@ -362,6 +362,7 @@ export const initFirestoreRealtimeSync = () => {
         phone: state.phone,
         shippingAddress: state.shippingAddress,
         savedAddresses: state.savedAddresses,
+        savedCards: state.savedCards,
         preferences: state.preferences
       });
     }

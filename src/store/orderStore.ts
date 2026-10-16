@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useNotificationStore } from './notificationStore';
 
 export interface OrderItem {
   id: string;
@@ -109,21 +110,42 @@ export const useOrderStore = create<OrderStore>()(
   persist(
     (set) => ({
       orders: initialOrders,
-      addOrder: (order) =>
+      addOrder: (order) => {
+        const orderId = `ORD-${Date.now().toString().slice(-6)}`;
+        const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        // Emit real-time notification
+        useNotificationStore.getState().addNotification({
+          category: 'order',
+          title: 'Order Confirmed! 🛍️',
+          message: `Your order #${orderId} (${order.itemsCount} ${order.itemsCount === 1 ? 'item' : 'items'}, $${order.total.toFixed(2)}) has been placed successfully and is being prepared.`,
+          link: '/profile',
+        });
+
         set((state) => ({
           orders: [
             {
               ...order,
-              id: `ORD-${Date.now().toString().slice(-6)}`,
-              date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              id: orderId,
+              date,
             },
             ...state.orders,
           ],
-        })),
-      updateOrderStatus: (id, status) =>
+        }));
+      },
+      updateOrderStatus: (id, status) => {
+        const statusEmoji = status === 'Delivered' ? '✅' : status === 'Shipped' ? '🚚' : status === 'Cancelled' ? '❌' : '📦';
+        useNotificationStore.getState().addNotification({
+          category: 'order',
+          title: `Order #${id} ${status} ${statusEmoji}`,
+          message: `Your order #${id} has been marked as "${status}".`,
+          link: '/profile',
+        });
+
         set((state) => ({
           orders: state.orders.map((o) => (o.id === id ? { ...o, status } : o)),
-        })),
+        }));
+      },
       deleteOrder: (id) =>
         set((state) => ({
           orders: state.orders.filter((o) => o.id !== id),

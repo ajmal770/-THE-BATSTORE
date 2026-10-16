@@ -485,11 +485,11 @@ const MobileMenuDrawer: React.FC<{ isOpen: boolean, onClose: () => void, user: a
 };
 
 // ─── NOTIFICATION PANEL COMPONENT ───────────────────────────────────────────
-const CATEGORY_META: Record<NotificationCategory, { label: string; color: string; dot: string }> = {
-  order:   { label: 'Order',   color: 'text-blue-600 bg-blue-50 border-blue-200',   dot: 'bg-blue-500' },
-  account: { label: 'Account', color: 'text-violet-600 bg-violet-50 border-violet-200', dot: 'bg-violet-500' },
-  promo:   { label: 'Promo',   color: 'text-amber-600 bg-amber-50 border-amber-200',  dot: 'bg-amber-500' },
-  system:  { label: 'System',  color: 'text-slate-600 bg-slate-100 border-slate-200', dot: 'bg-slate-400' },
+const CATEGORY_META: Record<NotificationCategory, { label: string; avatarBg: string; icon: React.ReactNode }> = {
+  order:   { label: 'Order',   avatarBg: 'bg-blue-50 text-blue-600 border-blue-100',   icon: <Package size={13} className="stroke-[2.5]" /> },
+  account: { label: 'Account', avatarBg: 'bg-violet-50 text-violet-600 border-violet-100', icon: <User size={13} className="stroke-[2.5]" /> },
+  promo:   { label: 'Promo',   avatarBg: 'bg-amber-50 text-amber-600 border-amber-100',  icon: <Tag size={13} className="stroke-[2.5]" /> },
+  system:  { label: 'System',  avatarBg: 'bg-slate-50 text-slate-600 border-slate-200', icon: <Bell size={13} className="stroke-[2.5]" /> },
 };
 
 function timeAgo(isoString: string): string {
@@ -503,6 +503,7 @@ function timeAgo(isoString: string): string {
 type FilterTab = 'all' | NotificationCategory;
 
 const NotificationPanel: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const { notifications, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotificationStore();
   const [activeFilter] = useState<FilterTab>('all');
   const panelRef = useRef<HTMLDivElement>(null);
@@ -523,128 +524,139 @@ const NotificationPanel: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-
-
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           ref={panelRef}
-          initial={{ opacity: 0, y: 12, scale: 0.97 }}
+          initial={{ opacity: 0, y: 8, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 12, scale: 0.97 }}
-          transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="absolute top-full right-[-60px] md:right-[-100px] mt-3 w-[340px] bg-white/80 backdrop-blur-2xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 z-50 flex flex-col overflow-hidden"
-          style={{ maxHeight: '60vh' }}
+          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
+          className="absolute top-full right-[-8px] sm:right-[-6px] mt-2.5 w-[285px] sm:w-[295px] max-w-[calc(100vw-20px)] bg-white rounded-2xl shadow-[0_16px_40px_-8px_rgba(0,0,0,0.18)] border border-gray-150 z-50 flex flex-col overflow-hidden origin-top-right"
         >
+          {/* Authentic Pointer Arrow */}
+          <div className="absolute -top-1.5 right-[18px] w-3 h-3 bg-white border-t border-l border-gray-150 rotate-45 rounded-tl-2xs pointer-events-none z-10" />
+
           {/* Header */}
-          <div className="px-5 py-3 border-b border-gray-200/40 flex items-center justify-between bg-transparent shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-sapphire/10 text-sapphire rounded-lg">
-                <Bell size={16} className="stroke-[2.5]" />
-              </div>
-              <span className="font-black text-gray-900 text-base">Notifications</span>
-              {unreadCount > 0 && (
-                <span className="bg-sapphire text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+          <div className="px-3.5 py-3 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 relative z-20">
+            <div className="flex items-center gap-1.5">
+              <span className="font-black text-gray-900 text-xs tracking-tight">Notifications</span>
+              {unreadCount > 0 ? (
+                <span className="bg-sapphire text-white text-[9px] font-black px-1.5 py-0.2 rounded-full leading-tight">
                   {unreadCount}
                 </span>
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" title="Live updates active" />
               )}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               {unreadCount > 0 && (
                 <button
+                  type="button"
                   onClick={markAllAsRead}
                   title="Mark all as read"
-                  className="flex items-center gap-1 text-[11px] font-bold text-sapphire hover:text-deep-navy hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+                  className="flex items-center gap-1 text-[10px] font-extrabold text-sapphire hover:text-deep-navy hover:bg-blue-50/80 px-2 py-1 rounded-lg transition-all cursor-pointer border-none bg-transparent"
                 >
-                  <CheckCheck size={13} /> All read
+                  <CheckCheck size={12} /> Mark read
                 </button>
               )}
               {notifications.length > 0 && (
                 <button
+                  type="button"
                   onClick={clearAll}
-                  title="Clear all"
-                  className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+                  title="Clear all notifications"
+                  className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer border-none bg-transparent"
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={12} />
                 </button>
               )}
             </div>
           </div>
 
-
-
           {/* Notification List */}
-          <div className="overflow-y-auto flex-1">
+          <div className="overflow-y-auto flex-1 divide-y divide-gray-100/60 max-h-[350px]">
             {filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                <div className="w-16 h-16 bg-gray-200/30 rounded-full flex items-center justify-center mb-4">
-                  <Bell size={28} className="text-gray-400" />
+              <div className="flex flex-col items-center justify-center py-9 px-4 text-center">
+                <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 border border-gray-100 mb-2">
+                  <Bell size={16} className="stroke-[1.5]" />
                 </div>
-                <p className="text-sm font-bold text-gray-900">No notifications here</p>
-                <p className="text-xs text-gray-500 mt-1">You're all caught up!</p>
+                <p className="text-xs font-bold text-gray-800">All caught up!</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">No new notifications</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100/50">
-                {filtered.map(notif => {
-                  const meta = CATEGORY_META[notif.category];
-                  return (
-                    <motion.div
-                      key={notif.id}
-                      layout
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className={`relative flex gap-3 px-4 py-3.5 group cursor-pointer transition-all hover:bg-white/50 ${
-                        !notif.isRead ? 'bg-blue-50/20' : ''
-                      }`}
-                      onClick={() => markAsRead(notif.id)}
-                    >
-                      {/* Unread dot */}
-                      {!notif.isRead && (
-                        <span className={`absolute left-1.5 top-5 w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-                      )}
+              filtered.map((notif) => {
+                const meta = CATEGORY_META[notif.category] || CATEGORY_META.system;
+                return (
+                  <motion.div
+                    key={notif.id}
+                    layout
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className={`relative flex items-start gap-2.5 px-3.5 py-3 group cursor-pointer transition-all hover:bg-gray-50/80 ${
+                      !notif.isRead ? 'bg-blue-50/20' : ''
+                    }`}
+                    onClick={() => {
+                      markAsRead(notif.id);
+                      if (notif.link) {
+                        navigate(notif.link);
+                        onClose();
+                      }
+                    }}
+                  >
+                    {/* Category Icon Avatar */}
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border mt-0.5 shadow-2xs ${meta.avatarBg}`}>
+                      {meta.icon}
+                    </div>
 
-                      {/* Category badge */}
-                      <div className={`shrink-0 mt-0.5 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-wide h-fit ${meta.color}`}>
-                        {meta.label}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm leading-snug line-clamp-1 ${!notif.isRead ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'}`}>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 pr-0.5">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className={`text-xs leading-snug truncate ${!notif.isRead ? 'font-black text-gray-900' : 'font-bold text-gray-700'}`}>
                           {notif.title}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">
-                          {notif.message}
-                        </p>
-                        <p className="text-[10px] text-gray-400 mt-1 font-semibold">
+                        <span className="text-[9px] text-gray-400 font-medium shrink-0 whitespace-nowrap">
                           {timeAgo(notif.timestamp)}
-                        </p>
+                        </span>
                       </div>
+                      <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">
+                        {notif.message}
+                      </p>
+                    </div>
 
-                      {/* Delete button */}
+                    {/* Unread indicator dot & dismiss button */}
+                    <div className="shrink-0 flex items-center gap-1 self-start mt-1">
+                      {!notif.isRead && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-sapphire shrink-0 shadow-xs" title="Unread" />
+                      )}
                       <button
-                        onClick={(e) => { e.stopPropagation(); deleteNotification(notif.id); }}
-                        className="shrink-0 self-start opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all cursor-pointer"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteNotification(notif.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all cursor-pointer border-none p-0"
+                        title="Dismiss"
                       >
-                        <X size={13} />
+                        <X size={11} />
                       </button>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                    </div>
+                  </motion.div>
+                );
+              })
             )}
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t border-gray-200/40 bg-transparent shrink-0">
+          <div className="p-2.5 border-t border-gray-100 bg-gray-50/50 shrink-0">
             <Link
               to="/notifications"
               onClick={onClose}
-              className="block w-full py-2.5 text-center text-xs font-bold text-sapphire hover:text-white hover:bg-sapphire rounded-xl transition-all"
+              className="w-full py-2 text-center text-[11px] font-black text-gray-700 hover:text-sapphire hover:bg-white rounded-lg transition-all flex items-center justify-center gap-1.5 border border-transparent hover:border-gray-200/60 shadow-2xs"
             >
-              View all notifications
+              <span>View all notifications</span>
+              <ArrowRight size={12} />
             </Link>
           </div>
         </motion.div>

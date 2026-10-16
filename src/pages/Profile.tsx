@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Settings, Trash2, MapPin, Bell, Phone, Mail, Lock, CreditCard, Plus, Camera, X, User as UserIcon, Shield, CheckCircle2, Calendar, DollarSign, FileText, Check, Truck, Moon, Filter, ShoppingCart, Star, ChevronRight, CheckCircle, Package, Headset, Globe, KeyRound, Monitor, Smartphone, AlertTriangle, Download, ShieldCheck, Database, Cloud } from 'lucide-react';
+import { Settings, Trash2, MapPin, Bell, Mail, Lock, CreditCard, Plus, Camera, X, User as UserIcon, Shield, CheckCircle2, Calendar, DollarSign, FileText, Check, Truck, Moon, Filter, ShoppingCart, Star, ChevronRight, CheckCircle, Package, Headset, Globe, KeyRound, Monitor, Smartphone, AlertTriangle, Download, ShieldCheck, Database, Cloud, Navigation, ChevronDown, Edit3, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { useProfileStore } from '../store/profileStore';
@@ -9,8 +9,87 @@ import { useCartStore } from '../store/cartStore';
 import { useOrderStore, type Order } from '../store/orderStore';
 import { useProductStore } from '../store/productStore';
 import { isFirebaseConfigured, syncAllProjectDataToFirestore } from '../services/firestoreService';
+import { PhoneInputField } from '../components/PhoneInputField';
 
 type TabType = 'orders' | 'profile' | 'settings';
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 
+  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 
+  'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 
+  'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 
+  'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 
+  'Ladakh', 'Lakshadweep', 'Puducherry'
+];
+
+const CARD_THEMES = [
+  { id: 'sapphire', name: 'Royal Sapphire', gradient: 'from-[#0b1f3f] via-[#143d79] to-[#0a1832]', border: 'border-blue-400/40', accent: '#38bdf8', circle: 'bg-blue-600' },
+  { id: 'obsidian', name: 'Obsidian Black', gradient: 'from-[#0f172a] via-[#1e293b] to-[#090d16]', border: 'border-white/20', accent: '#94a3b8', circle: 'bg-slate-800' },
+  { id: 'emerald', name: 'Emerald Titanium', gradient: 'from-[#042f2e] via-[#065f46] to-[#022c22]', border: 'border-emerald-400/40', accent: '#34d399', circle: 'bg-emerald-700' },
+  { id: 'violet', name: 'Cyber Violet', gradient: 'from-[#2e1065] via-[#581c87] to-[#1e1b4b]', border: 'border-purple-400/40', accent: '#c084fc', circle: 'bg-purple-700' },
+  { id: 'gold', name: 'Imperial Gold', gradient: 'from-[#451a03] via-[#78350f] to-[#291002]', border: 'border-amber-400/40', accent: '#fbbf24', circle: 'bg-amber-600' }
+] as const;
+
+type CardThemeId = typeof CARD_THEMES[number]['id'];
+
+const detectCardBrand = (number: string): 'VISA' | 'MASTERCARD' | 'AMEX' | 'RUPAY' => {
+  const clean = number.replace(/\D/g, '');
+  if (/^4/.test(clean)) return 'VISA';
+  if (/^(5[1-5]|2[2-7])/.test(clean)) return 'MASTERCARD';
+  if (/^3[47]/.test(clean)) return 'AMEX';
+  if (/^(60|65|81|82|508)/.test(clean)) return 'RUPAY';
+  return 'VISA';
+};
+
+const formatCardNumber = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 16);
+  return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+};
+
+const formatExpiry = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 4);
+  if (digits.length >= 2) {
+    let month = parseInt(digits.slice(0, 2), 10);
+    if (month > 12) month = 12;
+    if (month === 0) month = 1;
+    const monthStr = month < 10 ? `0${month}` : `${month}`;
+    const year = digits.slice(2);
+    return `${monthStr}${year ? '/' + year : ''}`;
+  }
+  return digits;
+};
+
+const renderBrandLogo = (brand: string) => {
+  switch (brand) {
+    case 'MASTERCARD':
+      return (
+        <div className="flex items-center -space-x-2 drop-shadow-sm">
+          <div className="w-5 h-5 rounded-full bg-[#eb001b]" />
+          <div className="w-5 h-5 rounded-full bg-[#f79e1b] opacity-90" />
+        </div>
+      );
+    case 'AMEX':
+      return (
+        <div className="bg-[#002663] text-white font-black text-[9px] px-1.5 py-0.5 rounded tracking-tighter border border-white/25">
+          AMEX
+        </div>
+      );
+    case 'RUPAY':
+      return (
+        <div className="flex items-center gap-0.5 bg-white text-gray-900 font-black text-[9px] px-1.5 py-0.5 rounded tracking-tight shadow-xs">
+          <span className="text-[#005a9c]">Ru</span><span className="text-[#f47920]">Pay</span>
+        </div>
+      );
+    case 'VISA':
+    default:
+      return (
+        <span className="text-base font-black italic tracking-wider text-white drop-shadow-md">
+          VISA
+        </span>
+      );
+  }
+};
 
 const Profile: React.FC = () => {
   const { user, registeredUsers, updateUser } = useAuthStore();
@@ -34,12 +113,37 @@ const Profile: React.FC = () => {
 
   // Modals state
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // Modal data state
-  const [newAddress, setNewAddress] = useState({ label: '', street: '', city: '', state: '', zip: '' });
-  const [newCard, setNewCard] = useState({ name: '', cardNumber: '', expiry: '', brand: 'VISA' });
+  const [newAddress, setNewAddress] = useState({
+    name: '',
+    phone: '',
+    pincode: '',
+    locality: '',
+    street: '',
+    city: '',
+    state: '',
+    landmark: '',
+    alternatePhone: '',
+    addressType: 'Home' as 'Home' | 'Work',
+    zip: '',
+    label: 'Home'
+  });
+  const [newCard, setNewCard] = useState({
+    name: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+    brand: 'VISA' as 'VISA' | 'MASTERCARD' | 'AMEX' | 'RUPAY',
+    theme: 'sapphire' as CardThemeId,
+    isDefault: false
+  });
+  const [showCvv, setShowCvv] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
   const [reviewModalData, setReviewModalData] = useState<{ show: boolean, item: any, orderDate: string, orderId: string } | null>(null);
   const [reviewText, setReviewText] = useState('');
@@ -49,6 +153,58 @@ const Profile: React.FC = () => {
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: '', type }), 3000);
+  };
+
+  const handleOpenAddAddress = () => {
+    setEditingAddressId(null);
+    setNewAddress({
+      name: formData.fullName || '',
+      phone: formData.phone || '',
+      pincode: '',
+      locality: '',
+      street: '',
+      city: '',
+      state: '',
+      landmark: '',
+      alternatePhone: '',
+      addressType: 'Home',
+      zip: '',
+      label: 'Home'
+    });
+    setShowAddressModal(true);
+  };
+
+  const handleEditAddress = (addr: any) => {
+    setEditingAddressId(addr.id || null);
+    setNewAddress({
+      name: addr.name || formData.fullName || '',
+      phone: addr.phone || formData.phone || '',
+      pincode: addr.pincode || addr.zip || '',
+      locality: addr.locality || '',
+      street: addr.street || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      landmark: addr.landmark || '',
+      alternatePhone: addr.alternatePhone || '',
+      addressType: (addr.addressType as 'Home' | 'Work') || 'Home',
+      zip: addr.pincode || addr.zip || '',
+      label: addr.label || addr.addressType || 'Home'
+    });
+    setShowAddressModal(true);
+  };
+
+  const handleRemoveAddress = (id?: string) => {
+    if (!id) return;
+    if (window.confirm('Are you sure you want to remove this address?')) {
+      profile.removeAddress(id);
+      showToast('Address removed successfully');
+    }
+  };
+
+  const handleSetDefaultAddress = (id?: string) => {
+    if (!id) return;
+    profile.setDefaultAddress(id);
+    showToast('Default shipping address updated');
   };
 
   useEffect(() => {
@@ -61,14 +217,12 @@ const Profile: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: dbUser?.displayName || profile.fullName || user?.displayName || 'User',
     avatar: dbUser?.avatar || profile.avatar || null,
-    phone: dbUser?.phone || profile.phone,
+    phone: dbUser?.phone || profile.phone || '',
     shippingAddress: dbUser?.shippingAddress || profile.shippingAddress,
     billingAddress: dbUser?.billingAddress || profile.billingAddress,
     preferences: profile.preferences,
   });
 
-  const [editingShipping, setEditingShipping] = useState(false);
-  const [editingBilling, setEditingBilling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -429,9 +583,9 @@ const Profile: React.FC = () => {
             {/* Account Details */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-gray-300 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative overflow-hidden"
+              className="bg-white border border-gray-300 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative z-20"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sapphire/5 to-transparent rounded-bl-full -z-10" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sapphire/5 to-transparent rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none overflow-hidden" />
               <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
                 <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
                   <UserIcon size={20} className="stroke-[2.5]" />
@@ -463,322 +617,282 @@ const Profile: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">Phone Number</label>
-                  <div className="relative group">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sapphire transition-colors" size={18} />
-                    <input
-                      type="tel"
-                      placeholder="Mobile number for delivery updates"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3.5 bg-gray-50/30 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire outline-none transition-all text-gray-900 font-semibold placeholder:text-gray-400"
-                    />
-                  </div>
+                <div className="md:col-span-2">
+                  <PhoneInputField
+                    value={formData.phone}
+                    onChange={(newPhone) => setFormData({ ...formData, phone: newPhone })}
+                    placement="top"
+                  />
                 </div>
               </div>
             </motion.div>
 
-            {/* Address Book */}
+            {/* Split Vault Box: Left Side Address Book, Right Side Payment Methods */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-gray-300 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative overflow-hidden"
+              className="bg-white border border-gray-300 rounded-3xl p-5 sm:p-7 shadow-xl shadow-gray-200/20 relative overflow-hidden"
             >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                  <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
-                    <MapPin size={20} className="stroke-[2.5]" />
-                  </div>
-                  Address Book
-                </h3>
-                <button onClick={() => setShowAddressModal(true)} className="text-sapphire font-extrabold text-sm hover:text-deep-navy transition-colors flex items-center gap-1.5 bg-blue-50/50 px-3.5 py-2 rounded-xl border-none cursor-pointer">
-                  <Plus size={16} className="stroke-[2.5]" /> Add New
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Shipping Address */}
-                <motion.div
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="border border-gray-300 rounded-2xl p-6 relative group bg-gradient-to-b from-white to-gray-50/40 hover:shadow-lg hover:shadow-gray-200/40 hover:border-sapphire/20 transition-all duration-300"
-                >
-                  <div className="absolute top-4 right-4 bg-sapphire/10 text-sapphire text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm">Default Shipping</div>
-                  <h4 className="font-extrabold text-gray-900 mb-3">{formData.fullName}</h4>
-
-                  {editingShipping ? (
-                    <div className="space-y-3 mt-4">
-                      <input type="text" placeholder="Street Address" value={formData.shippingAddress.street} onChange={(e) => setFormData({ ...formData, shippingAddress: { ...formData.shippingAddress, street: e.target.value } })} className="w-full px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                      <input type="text" placeholder="City" value={formData.shippingAddress.city} onChange={(e) => setFormData({ ...formData, shippingAddress: { ...formData.shippingAddress, city: e.target.value } })} className="w-full px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                      <div className="flex gap-2">
-                        <input type="text" placeholder="State" value={formData.shippingAddress.state} onChange={(e) => setFormData({ ...formData, shippingAddress: { ...formData.shippingAddress, state: e.target.value } })} className="w-1/2 px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                        <input type="text" placeholder="ZIP" value={formData.shippingAddress.zip} onChange={(e) => setFormData({ ...formData, shippingAddress: { ...formData.shippingAddress, zip: e.target.value } })} className="w-1/2 px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+                {/* LEFT SIDE: Address Book */}
+                <div className="space-y-4">
+                  {/* Left Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-blue-50 text-sapphire rounded-xl shadow-xs">
+                        <MapPin size={18} className="stroke-[2.5]" />
                       </div>
-                      <button onClick={() => setEditingShipping(false)} className="w-full bg-sapphire text-white py-2.5 rounded-xl text-xs font-bold hover:bg-deep-navy shadow-md shadow-sapphire/15 border-none cursor-pointer">Done</button>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-gray-500 text-sm mb-1 font-medium">{formData.shippingAddress.street || 'No street provided'}</p>
-                      <p className="text-gray-500 text-sm mb-5 font-medium">
-                        {formData.shippingAddress.city ? `${formData.shippingAddress.city}, ` : ''}
-                        {formData.shippingAddress.state} {formData.shippingAddress.zip}
-                      </p>
-                      <div className="flex items-center justify-between border-t border-gray-100/60 pt-4">
-                        <button onClick={() => setEditingShipping(true)} className="text-sapphire text-xs font-black hover:text-deep-navy transition-colors bg-transparent border-none p-0 cursor-pointer">Edit Address</button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm('Are you sure you want to remove this shipping address?')) {
-                              const cleared = { street: '', city: '', state: '', zip: '' };
-                              setFormData(prev => ({ ...prev, shippingAddress: cleared }));
-                              updateProfile({ shippingAddress: cleared });
-                              if (user) updateUser(user.uid, { shippingAddress: cleared });
-                            }
-                          }}
-                          className="text-red-500 hover:text-red-600 text-xs font-black transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer"
-                        >
-                          <Trash2 size={13} /> Remove
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-
-                {/* Additional Saved Addresses */}
-                {profile.savedAddresses?.map((address) => (
-                  <motion.div
-                    key={address.id}
-                    whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                    className="border border-gray-300 rounded-2xl p-6 relative group bg-gradient-to-b from-white to-gray-50/40 hover:shadow-lg hover:shadow-gray-200/40 hover:border-sapphire/20 transition-all duration-300"
-                  >
-                    <div className="absolute top-4 right-4 bg-gray-100 text-gray-500 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">{address.label || 'Saved'}</div>
-                    <h4 className="font-extrabold text-gray-900 mb-3">{formData.fullName}</h4>
-                    <p className="text-gray-500 text-sm mb-1 font-medium">{address.street}</p>
-                    <p className="text-gray-500 text-sm mb-5 font-medium">
-                      {address.city ? `${address.city}, ` : ''}
-                      {address.state} {address.zip}
-                    </p>
-                    <div className="flex items-center justify-end border-t border-gray-100/60 pt-4">
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Are you sure you want to remove this address?')) {
-                            if (address.id) profile.removeAddress(address.id);
-                          }
-                        }}
-                        className="text-red-500 hover:text-red-600 text-xs font-black transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer"
-                      >
-                        <Trash2 size={13} /> Remove
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-
-                {/* Billing Address */}
-                <motion.div
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                  className="border border-gray-300 rounded-2xl p-6 relative group bg-gradient-to-b from-white to-gray-50/40 hover:shadow-lg hover:shadow-gray-200/40 hover:border-sapphire/20 transition-all duration-300"
-                >
-                  <div className="absolute top-4 right-4 bg-gray-100 text-gray-500 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Default Billing</div>
-                  <h4 className="font-extrabold text-gray-900 mb-3">{formData.fullName}</h4>
-
-                  {editingBilling ? (
-                    <div className="space-y-3 mt-4">
-                      <input type="text" placeholder="Street Address" value={formData.billingAddress.street} onChange={(e) => setFormData({ ...formData, billingAddress: { ...formData.billingAddress, street: e.target.value } })} className="w-full px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                      <input type="text" placeholder="City" value={formData.billingAddress.city} onChange={(e) => setFormData({ ...formData, billingAddress: { ...formData.billingAddress, city: e.target.value } })} className="w-full px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                      <div className="flex gap-2">
-                        <input type="text" placeholder="State" value={formData.billingAddress.state} onChange={(e) => setFormData({ ...formData, billingAddress: { ...formData.billingAddress, state: e.target.value } })} className="w-1/2 px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                        <input type="text" placeholder="ZIP" value={formData.billingAddress.zip} onChange={(e) => setFormData({ ...formData, billingAddress: { ...formData.billingAddress, zip: e.target.value } })} className="w-1/2 px-3 py-2.5 border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire font-semibold" />
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => setFormData({ ...formData, billingAddress: formData.shippingAddress })} className="w-1/2 bg-gray-50 border border-gray-100 text-gray-700 py-2.5 rounded-xl text-xs font-bold hover:bg-gray-100 cursor-pointer">Copy Shipping</button>
-                        <button onClick={() => setEditingBilling(false)} className="w-1/2 bg-sapphire text-white py-2.5 rounded-xl text-xs font-bold hover:bg-deep-navy shadow-md shadow-sapphire/15 border-none cursor-pointer">Done</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-gray-500 text-sm mb-1 font-medium">{formData.billingAddress.street || 'Same as shipping address'}</p>
-                      <p className="text-gray-500 text-sm mb-5 font-medium">
-                        {formData.billingAddress.city ? `${formData.billingAddress.city}, ` : ''}
-                        {formData.billingAddress.state} {formData.billingAddress.zip}
-                      </p>
-                      <div className="flex items-center justify-between border-t border-gray-100/60 pt-4">
-                        <button onClick={() => setEditingBilling(true)} className="text-sapphire text-xs font-black hover:text-deep-navy transition-colors bg-transparent border-none p-0 cursor-pointer">Edit Address</button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm('Are you sure you want to remove this billing address?')) {
-                              const cleared = { street: '', city: '', state: '', zip: '' };
-                              setFormData(prev => ({ ...prev, billingAddress: cleared }));
-                              updateProfile({ billingAddress: cleared });
-                              if (user) updateUser(user.uid, { billingAddress: cleared });
-                            }
-                          }}
-                          className="text-red-500 hover:text-red-600 text-xs font-black transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer"
-                        >
-                          <Trash2 size={13} /> Remove
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-              </div>
-            </motion.div>
-
-            {/* Compact Executive Payment Methods & Digital Vault */}
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl shadow-gray-200/20 relative overflow-hidden"
-            >
-              {/* Compact Header Section */}
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-blue-50 text-sapphire rounded-xl">
-                    <CreditCard size={20} className="stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-black text-gray-900">Payment Methods</h3>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider border border-emerald-200/60 flex items-center gap-1">
-                        <ShieldCheck size={11} className="stroke-[2.5]" /> 256-Bit SSL
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 font-medium mt-0.5">
-                      Encrypted default cards & instant checkout
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setShowCardModal(true)}
-                  className="bg-gradient-to-r from-sapphire to-blue-600 text-white font-extrabold text-xs hover:from-deep-navy hover:to-sapphire transition-all duration-300 flex items-center gap-1.5 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md border-none cursor-pointer"
-                >
-                  <Plus size={15} className="stroke-[3]" /> Add Card
-                </button>
-              </div>
-
-              {/* Compact Sleek Card List */}
-              <div className="space-y-3">
-                {/* Primary Default Card */}
-                <motion.div
-                  whileHover={{ scale: 1.005 }}
-                  className="border border-gray-300 rounded-2xl p-4 flex items-center justify-between bg-gradient-to-r from-gray-50/70 via-white to-gray-50/40 hover:border-sapphire/30 transition-all duration-300 shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Mini Metallic Card Graphic */}
-                    <div className="w-13 h-8 bg-gradient-to-br from-[#0A192F] to-[#1E3A5F] rounded-lg flex items-center justify-between px-2 text-white shadow-md border border-white/10 shrink-0">
-                      <div className="w-3.5 h-2.5 bg-gradient-to-tr from-amber-400 to-yellow-200 rounded-xs" />
-                      <span className="text-[10px] font-black italic tracking-wide">VISA</span>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-extrabold text-gray-900 text-sm">Visa ending in •••• 4242</p>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black flex items-center gap-1 border border-emerald-200/60">
-                          <CheckCircle2 size={11} /> Default
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-400 font-semibold mt-0.5">
-                        Expires 12/28 • {formData.fullName || 'Alexander Wright'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400 px-3 py-1 bg-gray-50 rounded-lg">Primary</span>
-                  </div>
-                </motion.div>
-
-                {/* Secondary Saved Card */}
-                <motion.div
-                  whileHover={{ scale: 1.005 }}
-                  className="border border-gray-300 rounded-2xl p-4 flex items-center justify-between bg-gradient-to-r from-gray-50/70 via-white to-gray-50/40 hover:border-sapphire/30 transition-all duration-300 shadow-sm"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-13 h-8 bg-gradient-to-br from-[#0F172A] to-[#334155] rounded-lg flex items-center justify-between px-2 text-white shadow-md border border-white/10 shrink-0">
-                      <div className="w-3.5 h-2.5 bg-gradient-to-tr from-amber-400 to-yellow-200 rounded-xs" />
-                      <span className="text-[10px] font-black italic tracking-wide">VISA</span>
-                    </div>
-
-                    <div>
-                      <p className="font-extrabold text-gray-900 text-sm">Visa ending in •••• 8834</p>
-                      <p className="text-xs text-gray-400 font-semibold mt-0.5">
-                        Expires 10/30 • John Anderson
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => showToast('Updated primary default card!')}
-                      className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-sapphire hover:text-white text-gray-600 text-xs font-extrabold transition-all border border-gray-200/60 cursor-pointer"
-                    >
-                      Set Default
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (window.confirm('Remove this saved card?')) {
-                          showToast('Payment method removed.');
-                        }
-                      }}
-                      className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-xl transition-colors cursor-pointer border-none bg-transparent"
-                      title="Remove Card"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* Dynamic Saved Cards */}
-                {profile.savedCards?.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    whileHover={{ scale: 1.005 }}
-                    className="border border-gray-100 rounded-2xl p-4 flex items-center justify-between bg-gradient-to-r from-gray-50/70 via-white to-gray-50/40 hover:border-sapphire/30 transition-all duration-300 shadow-sm"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-13 h-8 bg-gradient-to-br from-[#064E3B] to-[#047857] rounded-lg flex items-center justify-between px-2 text-white shadow-md border border-white/10 shrink-0">
-                        <div className="w-3.5 h-2.5 bg-gradient-to-tr from-amber-400 to-yellow-200 rounded-xs" />
-                        <span className="text-[10px] font-black italic tracking-wide">{card.brand || 'VISA'}</span>
-                      </div>
-
                       <div>
-                        <p className="font-extrabold text-gray-900 text-sm">{card.brand || 'VISA'} ending in •••• {card.cardNumber}</p>
-                        <p className="text-xs text-gray-400 font-semibold mt-0.5">
-                          Expires {card.expiry || '12/29'} • {card.name}
-                        </p>
+                        <h4 className="text-base font-black text-gray-900">Address Book</h4>
+                        <p className="text-[11px] text-gray-400 font-medium">Delivery & billing addresses</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => showToast('Updated primary default card!')}
-                        className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-sapphire hover:text-white text-gray-600 text-xs font-extrabold transition-all border border-gray-200/60 cursor-pointer"
-                      >
-                        Set Default
-                      </button>
-                      <button
-                        onClick={() => {
-                          profile.removeCard(card.id);
-                          showToast('Payment card removed.');
-                        }}
-                        className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-xl transition-colors cursor-pointer border-none bg-transparent"
-                        title="Remove Card"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    <button
+                      type="button"
+                      onClick={handleOpenAddAddress}
+                      className="bg-white hover:bg-gray-50 text-black border border-gray-200 hover:border-gray-300 font-extrabold text-xs transition-all duration-200 flex items-center gap-1 px-3 py-1.5 rounded-xl shadow-2xs cursor-pointer"
+                    >
+                      <Plus size={14} className="stroke-[2.5]" /> Add Address
+                    </button>
+                  </div>
 
-              {/* Compact Inline Assurance Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mt-5 pt-4 border-t border-gray-100 text-[11px] font-bold text-gray-400">
-                <span className="flex items-center gap-1.5 text-gray-600">
-                  <ShieldCheck size={14} className="text-sapphire" /> Zero liability protection
-                </span>
-                <span className="flex items-center gap-1.5 text-gray-600">
-                  <Lock size={14} className="text-emerald-600" /> Tokenized & encrypted card vault
-                </span>
-                <span className="flex items-center gap-1.5 text-gray-600">
-                  <CheckCircle2 size={14} className="text-indigo-600" /> Instant 1-click checkout
-                </span>
+                  {/* Left Content: Compact Address List */}
+                  <div className="space-y-3">
+                    {profile.savedAddresses && profile.savedAddresses.length > 0 ? (
+                      profile.savedAddresses.map((address) => (
+                        <div
+                          key={address.id}
+                          className={`border rounded-2xl p-4 transition-all duration-300 relative group ${
+                            address.isDefault
+                              ? 'border-sapphire/40 bg-gradient-to-b from-blue-50/20 to-white shadow-xs'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="bg-blue-50 text-[#2874f0] text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+                                {address.addressType || address.label || 'Home'}
+                              </span>
+                              {address.isDefault && (
+                                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 border border-emerald-200/60">
+                                  <Check size={10} className="stroke-[3]" /> Default
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleEditAddress(address)}
+                                className="text-sapphire hover:text-deep-navy text-xs font-bold transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer"
+                              >
+                                <Edit3 size={12} /> Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveAddress(address.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors bg-transparent border-none p-0 cursor-pointer"
+                                title="Remove Address"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-1.5">
+                            <h5 className="font-extrabold text-gray-900 text-sm flex items-center gap-2 flex-wrap">
+                              <span>{address.name || formData.fullName}</span>
+                              {address.phone && (
+                                <span className="text-[11px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                                  {address.phone}
+                                </span>
+                              )}
+                            </h5>
+                          </div>
+
+                          <p className="text-gray-600 text-xs font-medium leading-relaxed">
+                            {address.street}{address.locality ? `, ${address.locality}` : ''}
+                          </p>
+                          <p className="text-gray-400 text-[11px] font-semibold mt-0.5">
+                            {address.city ? `${address.city}, ` : ''}{address.state} {address.pincode ? `- ${address.pincode}` : (address.zip ? `- ${address.zip}` : '')}
+                          </p>
+
+                          {!address.isDefault && (
+                            <div className="mt-2.5 pt-2 border-t border-gray-100 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => handleSetDefaultAddress(address.id)}
+                                className="text-[11px] font-bold text-gray-500 hover:text-sapphire transition-colors bg-transparent border-none p-0 cursor-pointer"
+                              >
+                                Set as Default
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-6 px-4 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                        <p className="text-xs font-bold text-gray-700">No addresses saved yet</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">Click above to add your first address</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* RIGHT SIDE: Payment Methods */}
+                <div className="space-y-4 lg:border-l lg:border-gray-100 lg:pl-8">
+                  {/* Right Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-blue-50 text-sapphire rounded-xl shadow-xs">
+                        <CreditCard size={18} className="stroke-[2.5]" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-base font-black text-gray-900">Payment Methods</h4>
+                          <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 flex items-center gap-0.5">
+                            <ShieldCheck size={9} /> SSL
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-400 font-medium">Encrypted 1-click checkout cards</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewCard({
+                          name: formData.fullName || '',
+                          cardNumber: '',
+                          expiry: '',
+                          cvv: '',
+                          brand: 'VISA',
+                          theme: 'sapphire',
+                          isDefault: profile.savedCards.length === 0
+                        });
+                        setIsFlipped(false);
+                        setShowCardModal(true);
+                      }}
+                      className="bg-white hover:bg-gray-50 text-black border border-gray-200 hover:border-gray-300 font-extrabold text-xs transition-all duration-200 flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl shadow-2xs cursor-pointer"
+                    >
+                      <Plus size={14} className="stroke-[3]" /> Add Card
+                    </button>
+                  </div>
+
+                  {/* Right Content: Compact Payment Cards */}
+                  <div className="space-y-3">
+                    {profile.savedCards && profile.savedCards.length > 0 ? (
+                      profile.savedCards.map((card) => {
+                        const theme = CARD_THEMES.find(t => t.id === card.theme) || CARD_THEMES[0];
+                        const brand = (card.brand || 'VISA').toUpperCase();
+
+                        return (
+                          <div
+                            key={card.id}
+                            className={`rounded-2xl p-4 sm:p-5 text-white relative overflow-hidden flex flex-col justify-between shadow-md transition-all duration-300 bg-gradient-to-br ${theme.gradient} border ${theme.border} min-h-[155px]`}
+                          >
+                            {/* Card Shimmer */}
+                            <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none" />
+
+                            {/* Top row */}
+                            <div className="flex items-center justify-between relative z-10">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-6 rounded bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-500 border border-yellow-100/60 shadow-inner p-0.5 flex flex-col justify-between relative overflow-hidden shrink-0">
+                                  <div className="w-full h-[1px] bg-amber-900/30 my-auto" />
+                                  <div className="absolute inset-x-1.5 inset-y-0.5 border border-amber-900/25 rounded-xs pointer-events-none" />
+                                </div>
+                                <svg className="w-3.5 h-3.5 text-white/80 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                                  <path d="M8.5 15.5a5 5 0 0 0 0-7" />
+                                  <path d="M12 18.5a9 9 0 0 0 0-13" />
+                                  <path d="M15.5 21.5a13 13 0 0 0 0-19" />
+                                </svg>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                {card.isDefault && (
+                                  <span className="bg-emerald-500/25 border border-emerald-400/40 text-emerald-200 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 backdrop-blur-xs">
+                                    <Check size={9} className="stroke-[3]" /> Default
+                                  </span>
+                                )}
+                                <div>{renderBrandLogo(brand)}</div>
+                              </div>
+                            </div>
+
+                            {/* Card Number */}
+                            <div className="my-2 relative z-10">
+                              <p className="font-mono text-base sm:text-lg font-bold tracking-widest text-white/95 drop-shadow-sm">
+                                •••• •••• •••• {card.cardNumber}
+                              </p>
+                            </div>
+
+                            {/* Card Footer */}
+                            <div className="relative z-10 pt-2 border-t border-white/10 flex items-end justify-between gap-3 text-xs">
+                              <div className="space-y-0.5">
+                                <span className="text-[8px] uppercase tracking-widest text-white/50 font-bold block">Holder</span>
+                                <p className="text-xs font-black tracking-wider text-white uppercase truncate max-w-[120px]">
+                                  {card.name || formData.fullName}
+                                </p>
+                              </div>
+
+                              <div className="space-y-0.5 text-center">
+                                <span className="text-[8px] uppercase tracking-widest text-white/50 font-bold block">Expires</span>
+                                <p className="text-xs font-mono font-bold text-white">
+                                  {card.expiry || '12/28'}
+                                </p>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 ml-auto">
+                                {!card.isDefault && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      profile.setDefaultCard(card.id);
+                                      showToast('Default payment card updated!');
+                                    }}
+                                    className="px-2 py-0.5 rounded bg-white/15 hover:bg-white text-white hover:text-gray-900 text-[10px] font-extrabold transition-all border border-white/20 cursor-pointer backdrop-blur-xs"
+                                  >
+                                    Set Default
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (window.confirm('Are you sure you want to remove this card?')) {
+                                      profile.removeCard(card.id);
+                                      showToast('Payment card removed.');
+                                    }
+                                  }}
+                                  className="p-1 rounded bg-white/10 hover:bg-red-500/80 text-white/80 hover:text-white transition-all cursor-pointer border border-white/10"
+                                  title="Remove Card"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="py-6 px-4 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                        <p className="text-xs font-bold text-gray-700">No cards saved yet</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">Click above to add a credit/debit card</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Assurance footer across bottom of the box */}
+                <div className="col-span-1 lg:col-span-2 pt-4 mt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-[11px] text-gray-400 font-semibold">
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-sapphire" /> 256-Bit SSL Encrypted Vault
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Lock size={14} className="text-emerald-500" /> Bank-Grade AES Tokenization
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-indigo-500" /> Instant 1-Click Vault Checkout
+                  </span>
+                </div>
               </div>
             </motion.div>
 
@@ -1236,142 +1350,732 @@ const Profile: React.FC = () => {
       {/* Add Address Modal */}
       <AnimatePresence>
         {showAddressModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-md w-full shadow-2xl relative overflow-hidden border border-gray-100">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sapphire to-blue-400" />
-              <button onClick={() => setShowAddressModal(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-all duration-300 cursor-pointer border-none"><X size={20} /></button>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+            <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }} className="bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative border border-gray-100 my-8">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddressModal(false);
+                  setEditingAddressId(null);
+                }}
+                className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors cursor-pointer border-none"
+              >
+                <X size={18} />
+              </button>
 
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center shadow-inner border border-blue-100/50">
-                  <MapPin size={28} className="text-sapphire" />
+              <h3 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide mb-4">
+                {editingAddressId ? 'Edit Address' : 'Add a New Address'}
+              </h3>
+
+              {/* Use My Current Location Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!navigator.geolocation) {
+                    showToast('Geolocation is not supported by your browser', 'error');
+                    return;
+                  }
+                  setIsLocating(true);
+                  navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                      try {
+                        const { latitude, longitude } = position.coords;
+                        // Enforce English language in Nominatim reverse geocode
+                        const res = await fetch(
+                          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en-US,en;q=0.9&addressdetails=1`,
+                          {
+                            headers: {
+                              'Accept-Language': 'en-US,en;q=0.9',
+                            },
+                          }
+                        );
+                        const data = await res.json();
+                        const addr = data.address || {};
+
+                        // Clean any Malayalam Unicode characters ([\u0D00-\u0D7F])
+                        const cleanEnglishText = (text: string = ''): string => {
+                          return text
+                            .replace(/[\u0D00-\u0D7F]+/g, '')
+                            .replace(/\s{2,}/g, ' ')
+                            .replace(/,\s*,/g, ', ')
+                            .replace(/^,\s*|,\s*$/g, '')
+                            .trim();
+                        };
+
+                        // Fallback transliterations for Kerala regions/districts if OSM native tag is present
+                        const keralaEnglishMap: Record<string, string> = {
+                          'തിരുവനന്തപുരം': 'Thiruvananthapuram',
+                          'കൊല്ലം': 'Kollam',
+                          'പത്തനംതിട്ട': 'Pathanamthitta',
+                          'ആലപ്പുഴ': 'Alappuzha',
+                          'കോട്ടയം': 'Kottayam',
+                          'ഇടുക്കി': 'Idukki',
+                          'എറണാകുളം': 'Ernakulam',
+                          'കൊച്ചി': 'Kochi',
+                          'തൃശ്ശൂർ': 'Thrissur',
+                          'പാലക്കാട്': 'Palakkad',
+                          'മലപ്പുറം': 'Malappuram',
+                          'കോഴിക്കോട്': 'Kozhikode',
+                          'വയനാട്': 'Wayanad',
+                          'കണ്ണൂർ': 'Kannur',
+                          'കാസർഗോഡ്': 'Kasaragod',
+                          'കാസർകോട്': 'Kasaragod',
+                          'കേരളം': 'Kerala',
+                          'കേരള': 'Kerala',
+                        };
+
+                        const resolveToEnglish = (text: string = ''): string => {
+                          let resolved = text;
+                          for (const [mal, eng] of Object.entries(keralaEnglishMap)) {
+                            if (resolved.includes(mal)) {
+                              resolved = resolved.replace(new RegExp(mal, 'g'), eng);
+                            }
+                          }
+                          return cleanEnglishText(resolved);
+                        };
+
+                        // 1. Resolve State in English
+                        const rawState = addr['state:en'] || addr.state || '';
+                        const resolvedState = resolveToEnglish(rawState);
+                        const matchedState = INDIAN_STATES.find(s =>
+                          s.toLowerCase() === resolvedState.toLowerCase() ||
+                          resolvedState.toLowerCase().includes(s.toLowerCase())
+                        );
+                        const finalState = matchedState || (resolvedState.toLowerCase().includes('kerala') ? 'Kerala' : resolvedState);
+
+                        // 2. Resolve City in English
+                        const rawCity = addr['city:en'] || addr.city || addr['town:en'] || addr.town || addr['state_district:en'] || addr.state_district || addr['county:en'] || addr.county || '';
+                        const finalCity = resolveToEnglish(rawCity);
+
+                        // 3. Resolve Locality in English
+                        const rawLocality = addr['suburb:en'] || addr.suburb || addr['neighbourhood:en'] || addr.neighbourhood || addr['village:en'] || addr.village || addr['road:en'] || addr.road || '';
+                        const finalLocality = resolveToEnglish(rawLocality);
+
+                        // 4. Resolve Street in English
+                        const road = resolveToEnglish(addr['road:en'] || addr.road || '');
+                        const suburb = resolveToEnglish(addr['suburb:en'] || addr.suburb || '');
+                        let finalStreet = [road, suburb].filter(Boolean).join(', ');
+                        if (!finalStreet && data.display_name) {
+                          const englishSegments = data.display_name
+                            .split(',')
+                            .map((seg: string) => resolveToEnglish(seg))
+                            .filter(Boolean);
+                          finalStreet = englishSegments.slice(0, 2).join(', ');
+                        }
+
+                        const pincode = addr.postcode || '';
+
+                        setNewAddress(prev => ({
+                          ...prev,
+                          pincode: pincode || prev.pincode,
+                          zip: pincode || prev.zip,
+                          locality: finalLocality || prev.locality,
+                          street: finalStreet || prev.street,
+                          city: finalCity || prev.city,
+                          state: finalState || prev.state,
+                        }));
+                        showToast('Current location detected in English!');
+                      } catch {
+                        showToast('Could not fetch address from coordinates', 'error');
+                      } finally {
+                        setIsLocating(false);
+                      }
+                    },
+                    () => {
+                      setIsLocating(false);
+                      showToast('Location permission denied or unavailable', 'error');
+                    },
+                    { timeout: 10000 }
+                  );
+                }}
+                disabled={isLocating}
+                className="bg-[#2874f0] hover:bg-[#1f62d1] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3 rounded shadow-xs flex items-center gap-2 cursor-pointer border-none transition-colors mb-5 disabled:opacity-60"
+              >
+                <Navigation size={15} className={`fill-white ${isLocating ? 'animate-spin' : ''}`} />
+                <span>{isLocating ? 'Detecting Location...' : 'Use my current location'}</span>
+              </button>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                {/* Row 1: Name and Mobile Number */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={newAddress.name}
+                    onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900">New Address</h3>
-                  <p className="text-xs text-gray-500 font-medium mt-1">Add a new destination to your address book</p>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
+                    value={newAddress.phone}
+                    onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value.replace(/\D/g, '') })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
                 </div>
-              </div>
 
-              <div className="space-y-5">
-                <div className="space-y-4">
-                  <input type="text" placeholder="Address Label (e.g. Home, Work)" value={newAddress.label} onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })} className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-sapphire focus:ring-4 focus:ring-sapphire/10 transition-all font-medium text-gray-900 placeholder:text-gray-400" />
-                  <input type="text" placeholder="Street Address" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-sapphire focus:ring-4 focus:ring-sapphire/10 transition-all font-medium text-gray-900 placeholder:text-gray-400" />
-                  <input type="text" placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-sapphire focus:ring-4 focus:ring-sapphire/10 transition-all font-medium text-gray-900 placeholder:text-gray-400" />
-                  <div className="flex gap-4">
-                    <input type="text" placeholder="State" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} className="w-1/2 px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-sapphire focus:ring-4 focus:ring-sapphire/10 transition-all font-medium text-gray-900 placeholder:text-gray-400" />
-                    <input type="text" placeholder="ZIP" value={newAddress.zip} onChange={(e) => setNewAddress({ ...newAddress, zip: e.target.value })} className="w-1/2 px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:bg-white focus:border-sapphire focus:ring-4 focus:ring-sapphire/10 transition-all font-medium text-gray-900 placeholder:text-gray-400" />
+                {/* Row 2: Pincode and Locality */}
+                <div>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Pincode"
+                    value={newAddress.pincode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setNewAddress({ ...newAddress, pincode: val, zip: val });
+                    }}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Locality"
+                    value={newAddress.locality}
+                    onChange={(e) => setNewAddress({ ...newAddress, locality: e.target.value })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
+                </div>
+
+                {/* Row 3: Address (Area and Street) */}
+                <div className="col-span-1 sm:col-span-2">
+                  <textarea
+                    rows={3}
+                    placeholder="Address (Area and Street)"
+                    value={newAddress.street}
+                    onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all resize-none"
+                  />
+                </div>
+
+                {/* Row 4: City/District/Town and State */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="City/District/Town"
+                    value={newAddress.city}
+                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <div className="relative border border-gray-300 rounded bg-white focus-within:border-[#2874f0] focus-within:ring-1 focus-within:ring-[#2874f0] px-3.5 py-1.5 transition-all">
+                    <label className="block text-[10px] text-gray-500 font-medium leading-none mb-1">State</label>
+                    <select
+                      value={newAddress.state}
+                      onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                      className="w-full bg-transparent text-sm text-gray-900 outline-none cursor-pointer pr-4 appearance-none"
+                    >
+                      <option value="">--Select State--</option>
+                      {INDIAN_STATES.map((state) => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                   </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    profile.addAddress({ id: Date.now().toString(), ...newAddress });
-                    setShowAddressModal(false);
-                    setNewAddress({ label: '', street: '', city: '', state: '', zip: '' });
-                    showToast('Address added successfully!');
-                  }}
-                  disabled={!newAddress.street || !newAddress.city}
-                  className="w-full bg-gradient-to-r from-sapphire to-blue-600 text-white py-4 rounded-2xl font-black mt-2 hover:from-deep-navy hover:to-sapphire transition-all duration-300 disabled:opacity-50 disabled:grayscale border-none cursor-pointer shadow-lg shadow-sapphire/20 hover:shadow-xl hover:-translate-y-0.5"
-                >
-                  Save Address
-                </button>
+                {/* Row 5: Landmark (Optional) and Alternate Phone (Optional) */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Landmark (Optional)"
+                    value={newAddress.landmark}
+                    onChange={(e) => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    placeholder="Alternate Phone (Optional)"
+                    value={newAddress.alternatePhone}
+                    onChange={(e) => setNewAddress({ ...newAddress, alternatePhone: e.target.value.replace(/\D/g, '') })}
+                    className="w-full px-3.5 py-3 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] outline-none transition-all"
+                  />
+                </div>
+
+                {/* Row 6: Address Type */}
+                <div className="col-span-1 sm:col-span-2 pt-1">
+                  <span className="block text-xs text-gray-500 font-medium mb-2.5">Address Type</span>
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-800 font-medium select-none">
+                      <input
+                        type="radio"
+                        name="addressType"
+                        value="Home"
+                        checked={newAddress.addressType === 'Home'}
+                        onChange={() => setNewAddress({ ...newAddress, addressType: 'Home', label: 'Home' })}
+                        className="w-4 h-4 text-[#2874f0] border-gray-300 focus:ring-[#2874f0] cursor-pointer"
+                      />
+                      <span>Home</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-800 font-medium select-none">
+                      <input
+                        type="radio"
+                        name="addressType"
+                        value="Work"
+                        checked={newAddress.addressType === 'Work'}
+                        onChange={() => setNewAddress({ ...newAddress, addressType: 'Work', label: 'Work' })}
+                        className="w-4 h-4 text-[#2874f0] border-gray-300 focus:ring-[#2874f0] cursor-pointer"
+                      />
+                      <span>Work</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Row 7: SAVE and CANCEL buttons */}
+                <div className="col-span-1 sm:col-span-2 flex items-center gap-6 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!newAddress.name?.trim()) {
+                        showToast('Please enter full name', 'error');
+                        return;
+                      }
+                      if (!newAddress.phone || newAddress.phone.length < 10) {
+                        showToast('Please enter a valid 10-digit mobile number', 'error');
+                        return;
+                      }
+                      if (!newAddress.pincode || newAddress.pincode.length < 6) {
+                        showToast('Please enter a valid 6-digit pincode', 'error');
+                        return;
+                      }
+                      if (!newAddress.street?.trim()) {
+                        showToast('Please enter Area and Street address', 'error');
+                        return;
+                      }
+                      if (!newAddress.city?.trim()) {
+                        showToast('Please enter City/District/Town', 'error');
+                        return;
+                      }
+                      if (!newAddress.state) {
+                        showToast('Please select State', 'error');
+                        return;
+                      }
+
+                      const savedAddr = {
+                        id: editingAddressId || Date.now().toString(),
+                        name: newAddress.name.trim(),
+                        phone: newAddress.phone,
+                        pincode: newAddress.pincode,
+                        locality: newAddress.locality?.trim(),
+                        street: newAddress.street.trim(),
+                        city: newAddress.city.trim(),
+                        state: newAddress.state,
+                        zip: newAddress.pincode,
+                        landmark: newAddress.landmark?.trim(),
+                        alternatePhone: newAddress.alternatePhone,
+                        addressType: newAddress.addressType,
+                        label: newAddress.addressType
+                      };
+
+                      if (editingAddressId) {
+                        profile.updateAddress(editingAddressId, savedAddr);
+                        showToast('Address updated successfully!');
+                      } else {
+                        profile.addAddress(savedAddr);
+                        showToast('Address added successfully!');
+                      }
+
+                      setShowAddressModal(false);
+                      setEditingAddressId(null);
+                      setNewAddress({
+                        name: '',
+                        phone: '',
+                        pincode: '',
+                        locality: '',
+                        street: '',
+                        city: '',
+                        state: '',
+                        landmark: '',
+                        alternatePhone: '',
+                        addressType: 'Home',
+                        zip: '',
+                        label: 'Home'
+                      });
+                    }}
+                    className="bg-[#2874f0] hover:bg-[#1a62d6] text-white px-10 sm:px-12 py-3.5 rounded font-bold uppercase text-sm tracking-wide shadow-md transition-colors cursor-pointer border-none"
+                  >
+                    SAVE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddressModal(false);
+                      setEditingAddressId(null);
+                    }}
+                    className="text-[#2874f0] hover:text-[#1a62d6] font-bold uppercase text-sm tracking-wide bg-transparent border-none cursor-pointer py-3.5 px-2 transition-colors"
+                  >
+                    CANCEL
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Add Card Modal */}
+      {/* Advanced Interactive Payment Card Modal */}
       <AnimatePresence>
         {showCardModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="bg-white rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl relative overflow-hidden border border-gray-100">
-              <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-3 sm:p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl max-w-lg w-full shadow-2xl relative border border-gray-100 my-auto max-h-[92vh] flex flex-col overflow-hidden"
+            >
+              {/* Pinned Modal Header */}
+              <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3.5 border-b border-gray-100 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
-                    <CreditCard size={18} />
+                  <div className="p-2 bg-blue-50 text-sapphire rounded-xl shadow-xs">
+                    <CreditCard size={18} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-gray-900">Add Payment Card</h3>
-                    <p className="text-[11px] text-gray-400 font-medium">Encrypted wallet storage</p>
+                    <h3 className="text-base font-black text-gray-900 leading-tight">Add Payment Card</h3>
+                    <p className="text-[11px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
+                      <Lock size={11} className="text-emerald-500" /> 256-Bit Encrypted Digital Vault
+                    </p>
                   </div>
                 </div>
-                <button onClick={() => setShowCardModal(false)} className="text-gray-400 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-full p-1.5 transition-all cursor-pointer border-none"><X size={18} /></button>
+                <button
+                  type="button"
+                  onClick={() => setShowCardModal(false)}
+                  className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors cursor-pointer border-none"
+                >
+                  <X size={17} />
+                </button>
               </div>
 
-              <div className="space-y-4">
-                {/* Brand Selector */}
-                <div>
-                  <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 block">Card Brand</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['VISA', 'MASTERCARD', 'AMEX'].map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setNewCard({ ...newCard, brand: b })}
-                        className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer border ${
-                          newCard.brand === b
-                            ? 'bg-sapphire text-white border-sapphire shadow-sm'
-                            : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-                        }`}
+              {/* Scrollable Modal Content */}
+              <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4">
+                {/* Interactive Live Card Preview */}
+                <div className="perspective-1000">
+                  {(() => {
+                    const activeTheme = CARD_THEMES.find(t => t.id === newCard.theme) || CARD_THEMES[0];
+                    return (
+                      <motion.div
+                        animate={{ rotateY: isFlipped ? 180 : 0 }}
+                        transition={{ duration: 0.45, type: 'spring', damping: 20 }}
+                        className={`w-full max-w-[340px] aspect-[1.586/1] mx-auto rounded-2xl p-4 sm:p-5 text-white shadow-xl relative overflow-hidden bg-gradient-to-br ${activeTheme.gradient} border ${activeTheme.border} flex flex-col justify-between`}
                       >
-                        {b}
-                      </button>
-                    ))}
+                        {/* Metallic Shimmer Overlays */}
+                        <div className="absolute -right-10 -top-10 w-36 h-36 bg-white/10 rounded-full blur-xl pointer-events-none" />
+                        <div className="absolute -left-10 -bottom-10 w-36 h-36 bg-black/25 rounded-full blur-xl pointer-events-none" />
+
+                        {!isFlipped ? (
+                          /* Front of Card */
+                          <>
+                            <div className="flex items-center justify-between relative z-10">
+                              <div className="flex items-center gap-2.5">
+                                {/* Authentic Golden EMV Smart Chip */}
+                                <div className="w-8 h-6 rounded bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-500 border border-yellow-100/70 shadow-inner p-0.5 flex flex-col justify-between relative overflow-hidden shrink-0">
+                                  <div className="w-full h-[1px] bg-amber-900/30 my-auto" />
+                                  <div className="absolute inset-x-1.5 inset-y-0.5 border border-amber-900/25 rounded-xs pointer-events-none" />
+                                </div>
+                                {/* Authentic Contactless Waves Icon */}
+                                <svg className="w-4 h-4 text-white/90 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                                  <path d="M8.5 15.5a5 5 0 0 0 0-7" />
+                                  <path d="M12 18.5a9 9 0 0 0 0-13" />
+                                  <path d="M15.5 21.5a13 13 0 0 0 0-19" />
+                                </svg>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsFlipped(true)}
+                                  className="px-2 py-0.5 rounded-full bg-white/15 hover:bg-white/25 text-white text-[9px] font-extrabold uppercase tracking-wider transition-all border border-white/20 cursor-pointer backdrop-blur-xs"
+                                >
+                                  CVV
+                                </button>
+                                <div>{renderBrandLogo(newCard.brand)}</div>
+                              </div>
+                            </div>
+
+                            <div className="my-auto relative z-10 py-1">
+                              <p className="font-mono text-base sm:text-lg font-bold tracking-widest text-white drop-shadow-md">
+                                {newCard.cardNumber
+                                  ? formatCardNumber(newCard.cardNumber)
+                                  : '•••• •••• •••• ••••'}
+                              </p>
+                            </div>
+
+                            <div className="flex items-end justify-between relative z-10 pt-1.5 border-t border-white/15 text-xs">
+                              <div className="space-y-0.5">
+                                <span className="text-[8px] uppercase tracking-widest text-white/50 font-bold block">
+                                  Cardholder Name
+                                </span>
+                                <p className="text-xs font-black tracking-wider text-white uppercase truncate max-w-[170px]">
+                                  {newCard.name || formData.fullName || 'CARDHOLDER NAME'}
+                                </p>
+                              </div>
+
+                              <div className="space-y-0.5 text-right">
+                                <span className="text-[8px] uppercase tracking-widest text-white/50 font-bold block">
+                                  Expires
+                                </span>
+                                <p className="text-xs font-mono font-bold text-white tracking-wider">
+                                  {newCard.expiry || 'MM/YY'}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          /* Back of Card (CVV mode) */
+                          <div className="h-full flex flex-col justify-between py-1 -mx-4 sm:-mx-5">
+                            {/* Black Magnetic Stripe */}
+                            <div className="w-full h-8 bg-black/90 shadow-inner mb-1" />
+
+                            <div className="px-4 sm:px-5 space-y-1">
+                              <div className="flex items-center justify-between text-[8px] text-white/70 uppercase tracking-widest font-bold">
+                                <span>Authorized Signature</span>
+                                <span>Security Code</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-7 bg-white/90 rounded flex items-center px-2 text-gray-500 font-mono text-[10px] italic">
+                                  Electronic Verification
+                                </div>
+                                <div className="w-12 h-7 bg-white text-gray-900 rounded font-mono font-bold text-xs flex items-center justify-center border border-amber-400 shadow-inner">
+                                  {showCvv ? (newCard.cvv || '•••') : '•••'}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="px-4 sm:px-5 flex items-center justify-between text-[8px] text-white/60 font-mono">
+                              <button
+                                type="button"
+                                onClick={() => setIsFlipped(false)}
+                                className="text-white hover:text-white/80 underline cursor-pointer bg-transparent border-none p-0 text-[9px] font-bold"
+                              >
+                                ← Front
+                              </button>
+                              <span>256-Bit SSL Token</span>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })()}
+                </div>
+
+                {/* Theme & Brand Selectors */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                  {/* Theme Selector */}
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1 block">
+                      <Sparkles size={11} className="text-sapphire" /> Card Theme
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {CARD_THEMES.map((theme) => (
+                        <button
+                          key={theme.id}
+                          type="button"
+                          onClick={() => setNewCard({ ...newCard, theme: theme.id })}
+                          title={theme.name}
+                          className={`w-6 h-6 rounded-full ${theme.circle} transition-all cursor-pointer border-2 ${
+                            newCard.theme === theme.id ? 'ring-2 ring-sapphire ring-offset-2 scale-110 border-white' : 'border-transparent opacity-75 hover:opacity-100'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Brand Selector */}
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 block">
+                      Card Brand
+                    </label>
+                    <div className="grid grid-cols-4 gap-1">
+                      {(['VISA', 'MASTERCARD', 'AMEX', 'RUPAY'] as const).map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => setNewCard({ ...newCard, brand: b })}
+                          className={`py-1 rounded-lg text-[10px] font-black transition-all cursor-pointer border ${
+                            newCard.brand === b
+                              ? 'bg-sapphire text-white border-sapphire shadow-xs'
+                              : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          {b === 'MASTERCARD' ? 'Mastercard' : b === 'RUPAY' ? 'RuPay' : b}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2.5">
-                  <input
-                    type="text"
-                    placeholder="Cardholder Name"
-                    value={newCard.name}
-                    onChange={(e) => setNewCard({ ...newCard, name: e.target.value.toUpperCase() })}
-                    className="w-full px-4 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-sapphire transition-all font-medium text-gray-900 placeholder:text-gray-400 text-xs sm:text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Card Number (16 Digits)"
-                    value={newCard.cardNumber}
-                    onChange={(e) => setNewCard({ ...newCard, cardNumber: e.target.value.replace(/\D/g, '') })}
-                    maxLength={16}
-                    className="w-full px-4 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-sapphire transition-all font-medium text-gray-900 placeholder:text-gray-400 font-mono tracking-wider text-xs sm:text-sm"
-                  />
-                  <div className="flex gap-2.5">
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      value={newCard.expiry}
-                      onChange={(e) => setNewCard({ ...newCard, expiry: e.target.value })}
-                      maxLength={5}
-                      className="w-1/2 px-4 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-sapphire transition-all font-medium text-gray-900 placeholder:text-gray-400 font-mono text-xs sm:text-sm"
-                    />
-                    <input
-                      type="password"
-                      placeholder="CVV"
-                      maxLength={4}
-                      className="w-1/2 px-4 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-sapphire transition-all font-medium text-gray-900 placeholder:text-gray-400 font-mono text-xs sm:text-sm"
-                    />
+                {/* Form Input Fields */}
+                <div className="space-y-3 pt-1">
+                  {/* Cardholder Name */}
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">
+                      Cardholder Name
+                    </label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                      <input
+                        type="text"
+                        placeholder="NAME ON CARD"
+                        value={newCard.name}
+                        onChange={(e) => setNewCard({ ...newCard, name: e.target.value.toUpperCase() })}
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50/70 border border-gray-300 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire transition-all font-bold text-gray-900 placeholder:text-gray-400 text-sm tracking-wide"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card Number */}
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">
+                      Card Number (16 Digits)
+                    </label>
+                    <div className="relative">
+                      <CreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                      <input
+                        type="text"
+                        placeholder="1234 5678 9012 3456"
+                        value={formatCardNumber(newCard.cardNumber)}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
+                          const autoBrand = detectCardBrand(raw);
+                          setNewCard({ ...newCard, cardNumber: raw, brand: autoBrand });
+                        }}
+                        maxLength={19}
+                        className="w-full pl-9 pr-14 py-2.5 bg-gray-50/70 border border-gray-300 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire transition-all font-mono font-bold text-gray-900 placeholder:text-gray-400 text-sm tracking-widest"
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {renderBrandLogo(newCard.brand)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expiry Date & CVV Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">
+                        Expiry Date
+                      </label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                          type="text"
+                          placeholder="MM / YY"
+                          value={newCard.expiry}
+                          onChange={(e) => setNewCard({ ...newCard, expiry: formatExpiry(e.target.value) })}
+                          maxLength={5}
+                          className="w-full pl-9 pr-3 py-2.5 bg-gray-50/70 border border-gray-300 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire transition-all font-mono font-bold text-gray-900 placeholder:text-gray-400 text-sm text-center"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1">
+                        CVV / Security Code
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                          type={showCvv ? 'text' : 'password'}
+                          placeholder="•••"
+                          value={newCard.cvv}
+                          onChange={(e) => setNewCard({ ...newCard, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                          onFocus={() => setIsFlipped(true)}
+                          onBlur={() => setIsFlipped(false)}
+                          maxLength={4}
+                          className="w-full pl-9 pr-10 py-2.5 bg-gray-50/70 border border-gray-300 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire transition-all font-mono font-bold text-gray-900 placeholder:text-gray-400 text-sm text-center"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCvv(!showCvv)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer p-0"
+                        >
+                          {showCvv ? <EyeOff size={15} /> : <Eye size={15} />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Default Card Checkbox */}
+                  <div className="pt-0.5">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={newCard.isDefault}
+                        onChange={(e) => setNewCard({ ...newCard, isDefault: e.target.checked })}
+                        className="w-4 h-4 text-sapphire rounded border-gray-300 focus:ring-sapphire cursor-pointer"
+                      />
+                      <span className="text-xs text-gray-700 font-bold">
+                        Set as primary default card for 1-click checkout
+                      </span>
+                    </label>
                   </div>
                 </div>
+              </div>
 
+              {/* Pinned Modal Action Footer - Never Cut Off */}
+              <div className="flex items-center gap-3 px-5 sm:px-6 py-3.5 border-t border-gray-100 bg-gray-50/50 shrink-0">
                 <button
+                  type="button"
                   onClick={() => {
-                    const last4 = newCard.cardNumber.slice(-4) || 'XXXX';
+                    if (!newCard.name.trim()) {
+                      showToast('Please enter cardholder name', 'error');
+                      return;
+                    }
+                    const rawDigits = newCard.cardNumber.replace(/\D/g, '');
+                    if (rawDigits.length < 15) {
+                      showToast('Please enter a valid 16-digit card number', 'error');
+                      return;
+                    }
+                    if (!newCard.expiry || newCard.expiry.length < 4) {
+                      showToast('Please enter valid expiry date (MM/YY)', 'error');
+                      return;
+                    }
+
+                    const last4 = rawDigits.slice(-4);
                     profile.addCard({
                       id: Date.now().toString(),
-                      name: newCard.name,
+                      name: newCard.name.trim(),
                       cardNumber: last4,
-                      expiry: newCard.expiry,
-                      brand: newCard.brand || 'VISA'
+                      expiry: newCard.expiry.trim(),
+                      brand: newCard.brand || 'VISA',
+                      theme: newCard.theme || 'sapphire',
+                      isDefault: newCard.isDefault || profile.savedCards.length === 0
                     });
+
                     setShowCardModal(false);
-                    setNewCard({ name: '', cardNumber: '', expiry: '', brand: 'VISA' });
-                    showToast('Card added to encrypted vault!');
+                    setNewCard({
+                      name: '',
+                      cardNumber: '',
+                      expiry: '',
+                      cvv: '',
+                      brand: 'VISA',
+                      theme: 'sapphire',
+                      isDefault: false
+                    });
+                    setIsFlipped(false);
+                    showToast('Payment card added securely to vault!');
                   }}
-                  disabled={!newCard.name || !newCard.cardNumber}
-                  className="w-full bg-gradient-to-r from-sapphire to-blue-600 text-white py-3 rounded-xl font-bold text-xs sm:text-sm mt-3 hover:from-deep-navy hover:to-sapphire transition-all duration-300 disabled:opacity-50 disabled:grayscale border-none cursor-pointer shadow-md"
+                  className="flex-1 bg-gradient-to-r from-sapphire to-blue-600 hover:from-deep-navy hover:to-sapphire text-white py-3 rounded-xl font-black text-sm transition-all duration-300 border-none cursor-pointer shadow-lg shadow-sapphire/20 flex items-center justify-center gap-2 hover:shadow-xl"
                 >
-                  Save Card
+                  <ShieldCheck size={18} /> Save to Encrypted Vault
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCardModal(false)}
+                  className="px-4 py-3 text-gray-500 hover:text-gray-800 font-bold text-sm bg-white hover:bg-gray-100 rounded-xl transition-colors cursor-pointer border border-gray-200"
+                >
+                  Cancel
                 </button>
               </div>
             </motion.div>

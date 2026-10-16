@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, Trash2, X, ArrowLeft, Package, ShieldCheck, Tag, Wrench } from 'lucide-react';
+import { 
+  Bell, CheckCheck, Trash2, X, ArrowLeft, Package, 
+  ShieldCheck, Tag, Wrench, ShoppingBag, ExternalLink 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { useNotificationStore } from '../store/notificationStore';
@@ -46,12 +49,19 @@ const Notifications: React.FC = () => {
     { id: 'system',  label: 'System',     count: notifications.filter(n => n.category === 'system').length },
   ];
 
+  const handleNotificationClick = (notif: AppNotification) => {
+    markAsRead(notif.id);
+    if (notif.link) {
+      navigate(notif.link);
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      <SEO title="Notifications" description="View your order updates, account alerts, promotions and system messages." />
+      <SEO title="Notifications" description="View your real-time order updates, account security alerts, and live promotions." />
 
       {/* Hero Banner */}
-      <div className="h-48 bg-gradient-to-r from-deep-navy via-sapphire to-blue-400 relative overflow-hidden">
+      <div className="h-48 bg-gradient-to-r from-deep-navy via-sapphire to-blue-500 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 translate-y-1/2" />
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3" />
@@ -70,19 +80,26 @@ const Notifications: React.FC = () => {
                 <ArrowLeft size={20} />
               </button>
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <div className="p-2.5 bg-sapphire/10 text-sapphire rounded-xl">
                     <Bell size={22} className="stroke-[2.5]" />
                   </div>
                   <h1 className="text-2xl font-black text-gray-900">Notifications</h1>
+                  
+                  {/* Real-time live status indicator */}
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-full text-xs font-bold shadow-xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Live Stream Active</span>
+                  </div>
+
                   {unreadCount > 0 && (
-                    <span className="bg-sapphire text-white text-xs font-black px-3 py-1 rounded-full animate-pulse">
+                    <span className="bg-sapphire text-white text-xs font-black px-3 py-1 rounded-full animate-pulse shadow-sm">
                       {unreadCount} new
                     </span>
                   )}
                 </div>
                 <p className="text-sm text-gray-500 mt-1 ml-14">
-                  Stay up to date with your orders, account activity, and promotions.
+                  Real-time live updates for your orders, account activity, and store promotions.
                 </p>
               </div>
             </div>
@@ -134,18 +151,39 @@ const Notifications: React.FC = () => {
         {/* Notification list */}
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/20 border border-gray-100 overflow-hidden">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-              <div className="p-7 bg-gray-100 rounded-full mb-5">
-                <Bell size={40} className="text-gray-300" />
+            <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 bg-blue-50/70 border border-blue-100 text-sapphire rounded-full flex items-center justify-center shadow-inner">
+                  <Bell size={36} className="stroke-[2]" />
+                </div>
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
               </div>
-              <p className="text-lg font-bold text-gray-500">No notifications here</p>
-              <p className="text-sm text-gray-400 mt-1">You're all caught up! 🎉</p>
+              
+              <h3 className="text-xl font-bold text-gray-800">Your live feed is clear</h3>
+              <p className="text-sm text-gray-500 mt-2 max-w-md leading-relaxed font-medium">
+                There are no pending alerts. Real-time notifications for placed orders, shipment status, account updates, and exclusive promos will appear here as they happen.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+                <button
+                  onClick={() => navigate('/products')}
+                  className="px-5 py-2.5 bg-gradient-to-r from-sapphire to-blue-600 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:shadow-sapphire/25 transition-all flex items-center gap-2 cursor-pointer border-none"
+                >
+                  <ShoppingBag size={14} /> Explore Catalog
+                </button>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="px-5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-xl text-xs font-bold transition-colors cursor-pointer border-none"
+                >
+                  View My Orders
+                </button>
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-gray-50/80">
               <AnimatePresence initial={false}>
                 {filtered.map((notif: AppNotification) => {
-                  const meta = CATEGORY_META[notif.category];
+                  const meta = CATEGORY_META[notif.category] || CATEGORY_META.system;
                   return (
                     <motion.div
                       key={notif.id}
@@ -154,10 +192,10 @@ const Notifications: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                       transition={{ duration: 0.22 }}
-                      className={`relative flex gap-4 sm:gap-5 px-5 sm:px-7 py-5 group cursor-pointer transition-colors hover:bg-gray-50/60 ${
-                        !notif.isRead ? 'bg-blue-50/25' : ''
+                      className={`relative flex gap-4 sm:gap-5 px-5 sm:px-7 py-5 group cursor-pointer transition-colors hover:bg-gray-50/80 ${
+                        !notif.isRead ? 'bg-blue-50/20' : ''
                       }`}
-                      onClick={() => markAsRead(notif.id)}
+                      onClick={() => handleNotificationClick(notif)}
                     >
                       {/* Unread dot */}
                       {!notif.isRead && (
@@ -192,12 +230,18 @@ const Notifications: React.FC = () => {
                           </span>
                         </div>
 
-                        {/* Category label */}
-                        <div className="mt-2.5">
+                        {/* Category label & action link */}
+                        <div className="mt-2.5 flex items-center justify-between">
                           <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border ${meta.bg} ${meta.color}`}>
                             {meta.icon}
                             {meta.label}
                           </span>
+
+                          {notif.link && (
+                            <span className="text-xs font-bold text-sapphire hover:underline flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                              View details <ExternalLink size={12} />
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -218,11 +262,10 @@ const Notifications: React.FC = () => {
         </div>
 
         {/* Footer note */}
-        {notifications.length > 0 && (
-          <p className="text-center text-xs text-gray-400 mt-6 font-medium">
-            Notifications are stored locally on this device.
-          </p>
-        )}
+        <p className="text-center text-xs text-gray-400 mt-6 font-medium flex items-center justify-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Real-time live notifications are active. New updates deliver automatically.
+        </p>
       </div>
     </div>
   );

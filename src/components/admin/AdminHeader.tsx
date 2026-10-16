@@ -86,19 +86,6 @@ export const AdminHeader: React.FC = () => {
     }
   });
 
-  // 3. Fallback support ticket
-  const ticketId = 'ticket-1';
-  if (!clearedNotifications.includes(ticketId)) {
-    notifications.push({
-      id: ticketId,
-      title: 'New Support Ticket',
-      description: 'Customer inquiry regarding delivery to NY',
-      time: '3 hours ago',
-      unread: !readNotifications.includes(ticketId),
-      type: 'ticket'
-    });
-  }
-
   // Sort: Put unread first, then type order
   notifications.sort((a, b) => {
     if (a.unread && !b.unread) return -1;

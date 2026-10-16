@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Plus, Search, Edit2, Trash2, X, Check, Zap, Filter, ChevronDown, ArrowUpRight, PackageSearch, Image as ImageIcon, Info, DollarSign, LayoutList, ShieldCheck, Star, TrendingUp } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Check, Zap, Filter, ChevronDown, ArrowUpRight, PackageSearch, Image as ImageIcon, Info, DollarSign, LayoutList, ShieldCheck, Star, TrendingUp, Bookmark } from 'lucide-react';
 import { useProductStore } from '../../store/productStore';
 import { useCategoryStore } from '../../store/categoryStore';
+import { useBrandStore } from '../../store/brandStore';
 import type { Product } from '../../store/productStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
@@ -102,6 +103,7 @@ const CustomSelect = ({ value, onChange, options, placeholder = "Select...", ico
 const Products: React.FC = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProductStore();
   const { categories } = useCategoryStore();
+  const { brands } = useBrandStore();
   const [mode, setMode] = useState<'list' | 'add' | 'edit'>('list');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -389,7 +391,25 @@ const Products: React.FC = () => {
                           {errors.category && <p className="text-red-500 text-[10px] font-bold px-1 mt-1">{errors.category}</p>}
                         </div>
 
-                        <InputField label="Brand Name" field="brand" placeholder="e.g. Nike" />
+                        <div className="space-y-1.5">
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Brand Name</label>
+                          <div className="relative group">
+                            <Bookmark className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sapphire transition-colors" size={16} />
+                            <input
+                              type="text"
+                              list="brand-suggestions"
+                              placeholder="Select or enter brand (e.g. Apple, Nike)"
+                              value={form.brand || ''}
+                              onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                              className="w-full pl-11 pr-4 py-3.5 bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-sapphire rounded-2xl text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:outline-none focus:bg-white focus:ring-4 focus:ring-sapphire/10"
+                            />
+                            <datalist id="brand-suggestions">
+                              {brands.filter(b => b.status === 'Active').map(b => (
+                                <option key={b.id} value={b.name}>{b.category ? `${b.name} (${b.category})` : b.name}</option>
+                              ))}
+                            </datalist>
+                          </div>
+                        </div>
                         
                         <div className="md:col-span-2">
                           <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Rich Description</label>
