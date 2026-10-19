@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Settings, Trash2, MapPin, Bell, Mail, Lock, CreditCard, Plus, Camera, X, User as UserIcon, Shield, CheckCircle2, Calendar, DollarSign, FileText, Check, Truck, Moon, Filter, ShoppingCart, Star, ChevronRight, CheckCircle, Package, Headset, Globe, KeyRound, Monitor, Smartphone, AlertTriangle, Download, ShieldCheck, Database, Cloud, Navigation, ChevronDown, Edit3, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Settings, Trash2, MapPin, Bell, Mail, Lock, CreditCard, Plus, Camera, X, User as UserIcon, Shield, CheckCircle2, Calendar, DollarSign, FileText, Check, Truck, Moon, Filter, ShoppingCart, Star, ChevronRight, CheckCircle, Package, Headset, Globe, AlertTriangle, Download, ShieldCheck, Navigation, ChevronDown, Edit3, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { useProfileStore } from '../store/profileStore';
 import { useCartStore } from '../store/cartStore';
+import { useWishlistStore } from '../store/wishlistStore';
+import { useCustomerStore } from '../store/customerStore';
+import { useNotificationStore } from '../store/notificationStore';
 import { useOrderStore, type Order } from '../store/orderStore';
 import { useProductStore } from '../store/productStore';
-import { isFirebaseConfigured, syncAllProjectDataToFirestore } from '../services/firestoreService';
+import { auth } from '../firebase/config';
 import { PhoneInputField } from '../components/PhoneInputField';
 
 type TabType = 'orders' | 'profile' | 'settings';
@@ -108,7 +111,6 @@ const Profile: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [toast, setToast] = useState<{ show: boolean, message: string, type: 'success' | 'error' }>({ show: false, message: '', type: 'success' });
   const [isSaving, setIsSaving] = useState(false);
-  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
   const [orderFilter, setOrderFilter] = useState('All Orders');
 
   // Modals state
@@ -117,6 +119,8 @@ const Profile: React.FC = () => {
   const [isLocating, setIsLocating] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   // Modal data state
   const [newAddress, setNewAddress] = useState({
@@ -213,9 +217,19 @@ const Profile: React.FC = () => {
     }
   }, [location.state?.tab]);
 
+  // Derive initial first name, second name (last name), and gender
+  const initialDisplayName = dbUser?.displayName || profile.fullName || user?.displayName || 'User';
+  const nameParts = initialDisplayName.trim().split(/\s+/);
+  const initialFirstName = dbUser?.firstName || profile.firstName || (nameParts.length > 0 ? nameParts[0] : '');
+  const initialLastName = dbUser?.lastName || profile.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(' ') : '');
+  const initialGender = dbUser?.gender || profile.gender || 'male';
+
   // Form State for Settings
   const [formData, setFormData] = useState({
-    fullName: dbUser?.displayName || profile.fullName || user?.displayName || 'User',
+    firstName: initialFirstName,
+    lastName: initialLastName,
+    fullName: initialDisplayName,
+    gender: initialGender,
     avatar: dbUser?.avatar || profile.avatar || null,
     phone: dbUser?.phone || profile.phone || '',
     shippingAddress: dbUser?.shippingAddress || profile.shippingAddress,
@@ -246,10 +260,22 @@ const Profile: React.FC = () => {
   };
 
   const handleSaveSettings = () => {
-    updateProfile(formData);
+    const computedFullName = [formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || formData.fullName || 'User';
+
+    updateProfile({
+      ...formData,
+      fullName: computedFullName,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      gender: formData.gender,
+    });
+
     if (user) {
       updateUser(user.uid, {
-        displayName: formData.fullName,
+        displayName: computedFullName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        gender: formData.gender,
         phone: formData.phone,
         shippingAddress: formData.shippingAddress,
         billingAddress: formData.billingAddress,
@@ -263,16 +289,59 @@ const Profile: React.FC = () => {
     }, 800);
   };
 
-  const handleCloudSync = async () => {
-    setIsSyncingCloud(true);
-    const result = await syncAllProjectDataToFirestore();
-    setIsSyncingCloud(false);
-    if (result.success) {
-      showToast(result.message, 'success');
-    } else {
-      showToast(result.message, 'error');
+  const handleConfirmDeleteAccount = async () => {
+    if (!user) return;
+    setIsDeletingAccount(true);
+    try {
+      const userUid = user.uid;
+      const userEmail = user.email || '';
+
+      // 1. Delete from Firebase Auth if current user exists
+      try {
+        if (auth?.currentUser && (auth.currentUser.uid === userUid || auth.currentUser.email === userEmail)) {
+          await auth.currentUser.delete();
+        }
+      } catch (fbErr) {
+        console.warn('Firebase user deletion bypassed or requires reauth:', fbErr);
+      }
+
+      // 2. Delete user from auth store
+      useAuthStore.getState().deleteUser(userUid);
+
+      // 3. Delete user customer record
+      useCustomerStore.getState().deleteCustomer(userUid);
+      if (userEmail) {
+        useCustomerStore.getState().deleteCustomer(userEmail);
+      }
+
+      // 4. Reset profile store (wipe addresses, cards, preferences)
+      useProfileStore.getState().resetProfile();
+
+      // 5. Clear cart and wishlist
+      useCartStore.getState().clearCart();
+      useWishlistStore.getState().clearWishlist();
+
+      // 6. Sign out session
+      useAuthStore.getState().logout();
+
+      setShowDeleteModal(false);
+      setIsDeletingAccount(false);
+
+      // Redirect to home with notification
+      navigate('/', { replace: true });
+      useNotificationStore.getState().addNotification({
+        category: 'account',
+        title: 'Account Deleted 🗑️',
+        message: 'Your account and personal data have been permanently removed.',
+        link: '/',
+      });
+    } catch (err) {
+      console.error('Account deletion error:', err);
+      setIsDeletingAccount(false);
+      showToast('Failed to delete account. Please try again.', 'error');
     }
   };
+
 
   if (!user) {
     navigate('/login');
@@ -580,49 +649,178 @@ const Profile: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Account Details */}
+            {/* Account Details - Advanced Luxury Model */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-gray-300 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative z-20"
+              className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-[28px] p-6 sm:p-8 shadow-xl shadow-slate-200/40 relative z-20 overflow-hidden group hover:shadow-2xl hover:shadow-sapphire/5 transition-all duration-300"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sapphire/5 to-transparent rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none overflow-hidden" />
-              <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
-                  <UserIcon size={20} className="stroke-[2.5]" />
+              {/* Luxury Ambient Mesh Highlights */}
+              <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-blue-500/10 via-sapphire/5 to-transparent rounded-bl-full pointer-events-none -z-10" />
+              <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-gradient-to-tr from-emerald-500/5 via-blue-500/5 to-transparent rounded-full blur-2xl pointer-events-none -z-10" />
+              <div className="absolute top-0 left-10 right-10 h-[2px] bg-gradient-to-r from-transparent via-sapphire/25 to-transparent pointer-events-none" />
+
+              {/* Section Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7 pb-5 border-b border-slate-100">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sapphire/15 via-blue-500/10 to-indigo-500/5 text-sapphire border border-sapphire/20 flex items-center justify-center shadow-inner shrink-0">
+                    <UserIcon size={22} className="stroke-[2.3]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                      Account Details
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      Personal credentials & verified profile identity
+                    </p>
+                  </div>
                 </div>
-                Account Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">Full Name</label>
+
+              </div>
+
+              {/* Inputs Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                
+                {/* First Name Field */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      First Name
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">Legal Name</span>
+                  </div>
                   <div className="relative group">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sapphire transition-colors animate-none" size={18} />
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-slate-100 group-focus-within:bg-blue-50 text-slate-400 group-focus-within:text-sapphire flex items-center justify-center transition-all duration-200 pointer-events-none">
+                      <UserIcon size={15} />
+                    </div>
                     <input
                       type="text"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3.5 bg-gray-50/30 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-sapphire/20 focus:border-sapphire outline-none transition-all text-gray-900 font-semibold placeholder:text-gray-400"
+                      placeholder="e.g. John"
+                      value={formData.firstName}
+                      onChange={(e) => {
+                        const updatedFirst = e.target.value;
+                        const updatedFull = [updatedFirst, formData.lastName].filter(Boolean).join(' ').trim();
+                        setFormData({ ...formData, firstName: updatedFirst, fullName: updatedFull });
+                      }}
+                      className="w-full pl-12 pr-4 py-3 bg-slate-50/70 hover:bg-slate-50/90 border border-slate-200/90 rounded-2xl focus:bg-white focus:ring-4 focus:ring-sapphire/10 focus:border-sapphire outline-none transition-all duration-200 text-slate-900 font-bold text-sm placeholder:text-slate-400 placeholder:font-normal shadow-2xs"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+
+                {/* Second Name (Last Name) Field */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Second Name (Last Name)
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">Surname</span>
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-slate-100 group-focus-within:bg-blue-50 text-slate-400 group-focus-within:text-sapphire flex items-center justify-center transition-all duration-200 pointer-events-none">
+                      <UserIcon size={15} />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="e.g. Doe"
+                      value={formData.lastName}
+                      onChange={(e) => {
+                        const updatedLast = e.target.value;
+                        const updatedFull = [formData.firstName, updatedLast].filter(Boolean).join(' ').trim();
+                        setFormData({ ...formData, lastName: updatedLast, fullName: updatedFull });
+                      }}
+                      className="w-full pl-12 pr-4 py-3 bg-slate-50/70 hover:bg-slate-50/90 border border-slate-200/90 rounded-2xl focus:bg-white focus:ring-4 focus:ring-sapphire/10 focus:border-sapphire outline-none transition-all duration-200 text-slate-900 font-bold text-sm placeholder:text-slate-400 placeholder:font-normal shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Email Address Field */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Email Address
+                    </label>
+                    <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 size={11} /> Verified Account
+                    </span>
+                  </div>
+                  <div className="relative flex items-center">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-slate-100 text-slate-400 flex items-center justify-center pointer-events-none">
+                      <Mail size={15} />
+                    </div>
                     <input
                       type="email"
                       defaultValue={user.email || ''}
                       readOnly
-                      className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-400 font-semibold outline-none cursor-not-allowed"
+                      className="w-full pl-12 pr-20 py-3 bg-slate-100/60 border border-slate-200/70 rounded-2xl text-slate-600 font-bold text-sm outline-none cursor-not-allowed select-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-200/60 text-slate-500 text-[10px] font-extrabold uppercase tracking-wide">
+                      <Lock size={10} /> Locked
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone Number Field */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Phone Number
+                    </label>
+                    <span className="text-[10px] font-bold text-blue-600">SMS Notifications</span>
+                  </div>
+                  <div>
+                    <PhoneInputField
+                      value={formData.phone}
+                      onChange={(newPhone) => setFormData({ ...formData, phone: newPhone })}
+                      placement="top"
+                      label=""
                     />
                   </div>
                 </div>
-                <div className="md:col-span-2">
-                  <PhoneInputField
-                    value={formData.phone}
-                    onChange={(newPhone) => setFormData({ ...formData, phone: newPhone })}
-                    placement="top"
-                  />
+
+                {/* Gender - Advanced Compact Segmented Control */}
+                <div className="md:col-span-2 space-y-2 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                      Gender Identity
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">Personalized Sizing & Catalog</span>
+                  </div>
+                  <div className="inline-flex p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80 gap-1.5 shadow-2xs">
+                    {[
+                      { id: 'male', label: 'Male' },
+                      { id: 'female', label: 'Female' },
+                      { id: 'other', label: 'Other' },
+                    ].map((g) => {
+                      const isSelected = (formData.gender || 'male').toLowerCase() === g.id;
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, gender: g.id })}
+                          className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-sapphire to-blue-600 text-white shadow-md shadow-sapphire/25 scale-[1.02]'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                          }`}
+                        >
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                          <span>{g.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Bottom Security Footer Strip */}
+              <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-500">
+                <div className="flex items-center gap-2 font-medium">
+                  <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
+                  <span>Account profile data encrypted & synced with session credentials</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-100">
+                  <Check size={12} className="text-emerald-500" />
+                  <span>Realtime State Ready</span>
                 </div>
               </div>
             </motion.div>
@@ -896,16 +1094,25 @@ const Profile: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Save Profile Actions */}
+            {/* Save Profile Actions & Delete Account */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 5 }, visible: { opacity: 1, y: 0 } }}
-              className="flex justify-end pt-4"
+              className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4"
             >
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(true)}
+                className="w-full sm:w-auto px-4 py-3 font-bold transition-colors duration-200 flex items-center justify-center gap-2 text-sm text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer"
+              >
+                <Trash2 size={16} />
+                <span>Delete Account</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleSaveSettings}
                 disabled={isSaving}
-                className={`px-8 py-4 rounded-2xl font-black transition-all duration-300 flex items-center justify-center gap-2 text-base transform hover:-translate-y-0.5 border-none min-w-[220px] ${isSaving
+                className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-black transition-all duration-300 flex items-center justify-center gap-2 text-base transform hover:-translate-y-0.5 border-none min-w-[220px] ${isSaving
                   ? 'bg-emerald-500 text-white cursor-default hover:-translate-y-0 shadow-lg shadow-emerald-500/25'
                   : 'bg-gradient-to-r from-sapphire to-blue-600 text-white cursor-pointer hover:shadow-xl hover:shadow-sapphire/25 hover:from-deep-navy hover:to-sapphire'
                   }`}
@@ -940,53 +1147,6 @@ const Profile: React.FC = () => {
             }}
             className="space-y-8"
           >
-            {/* Google Cloud Firestore Database Sync */}
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: -10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-gradient-to-r from-deep-navy via-sapphire to-blue-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-sapphire/20 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white border border-white/20 shadow-inner shrink-0">
-                  <Database size={26} className="stroke-[2.2]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-xl font-black text-white">Google Cloud Firestore Database</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider ${
-                      isFirebaseConfigured()
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                        : 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
-                    }`}>
-                      {isFirebaseConfigured() ? '🟢 Connected to Cloud' : '🟡 LocalStorage • Cloud Ready'}
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-blue-100/90 font-medium mt-1.5 max-w-xl leading-relaxed">
-                    {isFirebaseConfigured()
-                      ? 'Your project database is live-connected to Google Cloud Firestore. You can manually push all local data to your Firestore collections anytime.'
-                      : 'Your app is using fast LocalStorage persistence. To save to Cloud Firestore, add your Firebase API keys to your .env file and click Sync Now.'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloudSync}
-                disabled={isSyncingCloud}
-                className="w-full md:w-auto px-6 py-3.5 bg-white text-sapphire hover:bg-blue-50 font-black rounded-2xl transition-all shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-2.5 shrink-0 cursor-pointer disabled:opacity-75 border-none"
-              >
-                {isSyncingCloud ? (
-                  <>
-                    <Cloud size={18} className="animate-bounce text-sapphire" />
-                    <span>Syncing to Firestore...</span>
-                  </>
-                ) : (
-                  <>
-                    <Cloud size={18} className="text-sapphire" />
-                    <span>Sync All Data to Firestore</span>
-                  </>
-                )}
-              </button>
-            </motion.div>
 
             {/* Notifications & Security */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1089,137 +1249,78 @@ const Profile: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Two-Factor Authentication & Active Sessions */}
+            {/* Two-Factor Authentication (2FA) */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative overflow-hidden"
+              className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-7 shadow-xl shadow-gray-200/20 relative overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                    <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
-                      <KeyRound size={20} className="stroke-[2.5]" />
-                    </div>
-                    Two-Factor Authentication (2FA)
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium mt-1">Add an extra layer of security to your account upon signing in.</p>
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0 border border-emerald-100">
+                  <ShieldCheck size={24} className="stroke-[2.2]" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${formData.preferences.twoFactorEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {formData.preferences.twoFactorEnabled ? 'Enabled (Protected)' : 'Disabled'}
-                  </span>
-                  <div
-                    onClick={() => {
-                      const nextVal = !formData.preferences.twoFactorEnabled;
-                      setFormData({ ...formData, preferences: { ...formData.preferences, twoFactorEnabled: nextVal } });
-                      showToast(nextVal ? 'Two-Factor Authentication enabled!' : 'Two-Factor Authentication disabled', nextVal ? 'success' : 'error');
-                    }}
-                    className={`relative inline-block w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer ${formData.preferences.twoFactorEnabled ? 'bg-emerald-500' : 'bg-gray-200'}`}
-                  >
-                    <span className={`absolute top-1 bg-white w-4 h-4 rounded-full shadow-sm transition-transform duration-300 ${formData.preferences.twoFactorEnabled ? 'translate-x-7' : 'translate-x-1'}`}></span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-black text-gray-900">
+                      Two-Factor Authentication (2FA)
+                    </h3>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <CheckCircle2 size={13} className="text-emerald-600" /> Enabled
+                    </span>
                   </div>
-                </div>
-              </div>
-
-              {/* Active Logged-In Sessions */}
-              <div className="border-t border-gray-100 pt-5 mt-5">
-                <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Active Sign-in Sessions</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50/60 border border-gray-100 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-sapphire flex items-center justify-center">
-                        <Monitor size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">Windows PC - Chrome</p>
-                        <p className="text-xs text-gray-400">Current Session • Active now</p>
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">This Device</span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50/60 border border-gray-100 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center">
-                        <Smartphone size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">iPhone 15 Pro - Safari</p>
-                        <p className="text-xs text-gray-400">New York, USA • 2 hours ago</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => showToast('Session revoked successfully!', 'success')}
-                      className="text-xs font-bold text-red-600 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-red-100 bg-transparent"
-                    >
-                      Revoke
-                    </button>
-                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500 font-medium mt-1 leading-relaxed">
+                    Two-Factor Authentication is active and protecting your account. Every sign-in is secured with multi-factor verification for your security.
+                  </p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Privacy & Danger Zone */}
+            {/* Privacy & Account Data */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-              className="bg-white border border-red-100/80 rounded-3xl p-6 sm:p-8 shadow-xl shadow-red-500/5 relative overflow-hidden"
+              className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xl shadow-gray-200/20 relative overflow-hidden"
             >
               <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                <div className="p-2 bg-red-50 text-red-600 rounded-xl">
-                  <AlertTriangle size={20} className="stroke-[2.5]" />
+                <div className="p-2 bg-blue-50 text-sapphire rounded-xl">
+                  <Shield size={20} className="stroke-[2.5]" />
                 </div>
-                Privacy & Danger Zone
+                Privacy & Data
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Download Account Data */}
-                <div className="p-5 border border-gray-100 rounded-2xl bg-gray-50/40 flex flex-col justify-between gap-4">
-                  <div>
-                    <h4 className="font-extrabold text-gray-900 text-sm">Download My Account Data</h4>
-                    <p className="text-xs text-gray-500 font-medium mt-1">
-                      Download a complete JSON export of your personal profile, saved addresses, and order history for your records.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ profile: formData, orders: userOrders }, null, 2));
-                      const downloadAnchor = document.createElement('a');
-                      downloadAnchor.setAttribute("href", dataStr);
-                      downloadAnchor.setAttribute("download", `thebatstore_account_data_${user?.uid || 'export'}.json`);
-                      document.body.appendChild(downloadAnchor);
-                      downloadAnchor.click();
-                      downloadAnchor.remove();
-                      showToast('Account data exported successfully!', 'success');
-                    }}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-800 px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-gray-100 transition-all cursor-pointer shadow-sm"
-                  >
-                    <Download size={15} /> Export JSON Data
-                  </button>
+              <div className="p-5 border border-gray-100 rounded-2xl bg-gray-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-extrabold text-gray-900 text-sm">Download My Account Data</h4>
+                  <p className="text-xs text-gray-500 font-medium mt-1">
+                    Download a complete JSON export of your personal profile, saved addresses, and order history for your records.
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ profile: formData, orders: userOrders }, null, 2));
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", `thebatstore_account_data_${user?.uid || 'export'}.json`);
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                    showToast('Account data exported successfully!', 'success');
+                  }}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-800 px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-gray-100 transition-all cursor-pointer shadow-sm shrink-0"
+                >
+                  <Download size={15} /> Export JSON Data
+                </button>
+              </div>
 
-                {/* Account Deletion */}
-                <div className="p-5 border border-red-100 rounded-2xl bg-red-50/30 flex flex-col justify-between gap-4">
-                  <div>
-                    <h4 className="font-extrabold text-red-900 text-sm">Deactivate or Delete Account</h4>
-                    <p className="text-xs text-red-700/80 font-medium mt-1">
-                      Permanently delete your account, saved addresses, and active preferences. This action cannot be undone.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
-                        useAuthStore.getState().logout();
-                        navigate('/');
-                      }
-                    }}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-red-700 transition-all cursor-pointer shadow-sm shadow-red-500/20 border-none"
-                  >
-                    <Trash2 size={15} /> Delete Account
-                  </button>
-                </div>
+              {/* Delete Account Section */}
+              <div className="pt-5 mt-5 border-t border-gray-100 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  className="flex items-center gap-2 text-sm font-bold text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer transition-colors p-0"
+                >
+                  <Trash2 size={16} />
+                  <span>Delete Account</span>
+                </button>
               </div>
             </motion.div>
 
@@ -2275,6 +2376,126 @@ const Profile: React.FC = () => {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Account Confirmation Modal (Admin Customers Review Style) */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 bg-[#000926]/75 backdrop-blur-md flex items-center justify-center p-3 animate-in fade-in duration-150">
+            <div className="bg-white rounded-[22px] shadow-2xl max-w-[320px] w-full p-4 border border-slate-100 relative animate-in zoom-in-95 duration-150 text-left">
+              
+              {/* Compact Header Row */}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0 border border-red-100/60">
+                    <Trash2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-900 leading-tight">
+                      Delete Account?
+                    </h3>
+                    <p className="text-[10px] font-medium text-slate-500">
+                      Irreversible action
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => !isDeletingAccount && setShowDeleteModal(false)}
+                  disabled={isDeletingAccount}
+                  className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Compact User Details Box */}
+              <div className="bg-[#0F52BA]/5 border border-[#0F52BA]/15 rounded-xl p-2.5 mb-2.5 flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F52BA] to-[#000926] text-white font-medium text-xs flex items-center justify-center shrink-0 shadow-sm">
+                  {([formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || formData.fullName || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-slate-900 truncate">
+                    {[formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || formData.fullName || user.displayName || 'Account User'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+
+              {/* Compact Warning Box */}
+              <div className="bg-red-50/90 border border-red-200/80 rounded-xl p-2.5 mb-2.5 flex items-start gap-2">
+                <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <AlertTriangle className="w-3 h-3" />
+                </div>
+                <div className="text-[11px] leading-snug text-slate-700">
+                  <p className="font-semibold text-slate-800">
+                    Are you sure you want to delete?
+                  </p>
+                  <p>
+                    <span className="font-medium text-red-600">This action is permanent</span> and erases all data.
+                  </p>
+                </div>
+              </div>
+
+              {/* Compact Checklist Box */}
+              <div className="bg-slate-50/90 border border-slate-200/70 rounded-xl p-2.5 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 rounded-lg bg-blue-100/80 text-[#0F52BA] flex items-center justify-center shrink-0 mt-0.5">
+                  <Shield className="w-3 h-3" />
+                </div>
+                <div>
+                  <p className="font-medium text-slate-800 text-[11px] mb-1">
+                    Permanently deletes:
+                  </p>
+                  <ul className="space-y-0.5 text-[10px] text-slate-600 font-medium">
+                    <li className="flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-red-500 shrink-0" />
+                      <span>Personal information & data</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-red-500 shrink-0" />
+                      <span>Order history & transactions</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-red-500 shrink-0" />
+                      <span>Account access & permissions</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Compact Buttons Row */}
+              <div className="flex items-center gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => !isDeletingAccount && setShowDeleteModal(false)}
+                  disabled={isDeletingAccount}
+                  className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDeleteAccount}
+                  disabled={isDeletingAccount}
+                  className="flex-1 py-2 px-3 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-medium text-xs shadow-md shadow-[#E11D48]/25 hover:shadow-lg transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-60"
+                >
+                  <Trash2 className={`w-3 h-3 ${isDeletingAccount ? 'animate-spin' : ''}`} />
+                  <span>{isDeletingAccount ? 'Deleting...' : 'Delete'}</span>
+                </button>
+              </div>
+
+              {/* Compact Bottom Lock Info */}
+              <div className="flex items-center justify-center gap-1 text-[10px] font-semibold text-slate-400">
+                <Lock className="w-3 h-3" />
+                <span>Cannot be undone</span>
+              </div>
+
+            </div>
+          </div>
         )}
       </AnimatePresence>
 

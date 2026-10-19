@@ -12,7 +12,9 @@ import {
   X, 
   ShieldCheck, 
   Box, 
-  HeadphonesIcon 
+  HeadphonesIcon,
+  Minus,
+  Plus 
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
@@ -106,19 +108,14 @@ const Cart: React.FC = () => {
   return (
     <div className="bg-[#f8fafc] min-h-screen py-8 md:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Page Header (Matching Image 1) */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-center shrink-0">
-            <ShoppingCart className="text-[#2563eb]" size={26} strokeWidth={2.2} />
-          </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Shopping Cart
-            </h1>
-            <p className="text-xs md:text-sm text-slate-500 font-normal mt-0.5">
-              Review your items and proceed to checkout
-            </p>
-          </div>
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            Shopping Cart
+          </h1>
+          <p className="text-xs md:text-sm text-slate-500 font-normal mt-0.5">
+            Review your items and proceed to checkout
+          </p>
         </div>
 
         {/* Content: Empty State or 2-Column Responsive Layout */}
@@ -215,25 +212,27 @@ const Cart: React.FC = () => {
 
                       {/* Right: Stepper pill + Subtotal Price + Trash Icon */}
                       <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8 shrink-0">
-                        {/* Stepper Pill matching the image */}
-                        <div className="flex items-center bg-[#f1f5f9] border border-slate-200/60 rounded-2xl p-1 gap-1">
+                        {/* Stepper Pill - Medium Model */}
+                        <div className="flex items-center bg-[#f1f5f9] border border-slate-200/80 rounded-xl p-0.5 gap-0.5 shadow-2xs">
                           <button 
+                            type="button"
                             onClick={() => updateQuantity(item.id, item.color, item.size, item.quantity - 1)}
                             disabled={item.quantity <= 1}
-                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-800 font-semibold text-sm disabled:opacity-30 transition-all cursor-pointer"
+                            className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-35 disabled:hover:bg-white disabled:hover:text-slate-700 shadow-2xs border border-slate-200/70 transition-all cursor-pointer disabled:cursor-not-allowed"
                             title="Decrease quantity"
                           >
-                            −
+                            <Minus size={12} strokeWidth={2.4} />
                           </button>
-                          <span className="w-7 sm:w-8 text-center text-xs sm:text-sm font-bold text-slate-800">
+                          <span className="w-6 sm:w-7 text-center text-xs font-bold text-slate-800 tabular-nums select-none">
                             {item.quantity}
                           </span>
                           <button 
+                            type="button"
                             onClick={() => updateQuantity(item.id, item.color, item.size, item.quantity + 1)}
-                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl bg-white text-slate-800 hover:bg-slate-50 font-bold text-sm shadow-2xs border border-slate-200/60 transition-all cursor-pointer"
+                            className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 shadow-2xs border border-slate-200/70 transition-all cursor-pointer"
                             title="Increase quantity"
                           >
-                            +
+                            <Plus size={12} strokeWidth={2.4} />
                           </button>
                         </div>
 

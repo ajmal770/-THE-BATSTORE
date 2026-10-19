@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Truck, Receipt, Search, Save, AlertCircle, Database, Cloud, CheckCircle2 } from 'lucide-react';
 import { useSettingsStore, type Settings as SettingsType } from '../../store/settingsStore';
+import { isFirebaseConfigured, syncAllProjectDataToFirestore } from '../../services/firestoreService';
 
-type Tab = 'general' | 'shipping' | 'tax' | 'seo';
+type Tab = 'general' | 'shipping' | 'tax' | 'seo' | 'database';
 
 const Settings: React.FC = () => {
   const { settings, updateSettings } = useSettingsStore();
   const [activeTab, setActiveTab] = useState<Tab>('general');
   const [form, setForm] = useState<SettingsType>({ ...settings });
   const [isSaved, setIsSaved] = useState(false);
+  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
+  const [cloudSyncMsg, setCloudSyncMsg] = useState<{ text: string; error?: boolean } | null>(null);
+
+  const handleCloudSync = async () => {
+    setIsSyncingCloud(true);
+    setCloudSyncMsg(null);
+    const result = await syncAllProjectDataToFirestore();
+    setIsSyncingCloud(false);
+    setCloudSyncMsg({ text: result.message, error: !result.success });
+  };
 
   useEffect(() => {
     setForm({ ...settings });
@@ -81,6 +92,12 @@ const Settings: React.FC = () => {
               className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'seo' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
             >
               <Search size={20} className={activeTab === 'seo' ? 'text-sapphire' : 'text-gray-400'} /> Global SEO
+            </button>
+            <button 
+              onClick={() => setActiveTab('database')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 ${activeTab === 'database' ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 text-sapphire shadow-sm border border-blue-100/50' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent'}`}
+            >
+              <Database size={20} className={activeTab === 'database' ? 'text-sapphire' : 'text-gray-400'} /> Cloud Database
             </button>
           </div>
         </div>
@@ -307,6 +324,91 @@ const Settings: React.FC = () => {
                       className="w-full px-4 py-3.5 border border-gray-200 rounded-2xl bg-white/50 text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-sapphire/10 transition-all focus:border-sapphire/40 resize-none leading-relaxed" 
                     />
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'database' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 pb-6 border-b border-gray-100/60">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-sapphire shadow-inner border border-white">
+                    <Database size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Google Cloud Firestore Integration</h2>
+                    <p className="text-xs text-gray-500 font-medium">Manage backend persistence, cloud collections, and data synchronization</p>
+                  </div>
+                </div>
+
+                {/* Firestore Status Card */}
+                <div className="bg-gradient-to-r from-deep-navy via-sapphire to-blue-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-sapphire/20 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white border border-white/20 shadow-inner shrink-0">
+                      <Database size={26} className="stroke-[2.2]" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-xl font-black text-white">Google Cloud Firestore Database</h3>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider ${
+                          isFirebaseConfigured()
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                            : 'bg-amber-400/20 text-amber-200 border border-amber-300/40'
+                        }`}>
+                          {isFirebaseConfigured() ? '🟢 Connected to Cloud' : '🟡 LocalStorage • Cloud Ready'}
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-blue-100/90 font-medium mt-1.5 max-w-xl leading-relaxed">
+                        {isFirebaseConfigured()
+                          ? 'Your platform is live-connected to Google Cloud Firestore. As an administrator, you can synchronize all product catalog, order transactions, customer records, and system settings to Cloud Firestore.'
+                          : 'Your platform is currently running on LocalStorage persistence. To connect to Cloud Firestore, add your Firebase keys to your environment configuration (.env) and click Sync Now.'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCloudSync}
+                    disabled={isSyncingCloud}
+                    className="w-full md:w-auto px-6 py-3.5 bg-white text-sapphire hover:bg-blue-50 font-black rounded-2xl transition-all shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-2.5 shrink-0 cursor-pointer disabled:opacity-75 border-none"
+                  >
+                    {isSyncingCloud ? (
+                      <>
+                        <Cloud size={18} className="animate-bounce text-sapphire" />
+                        <span>Syncing to Firestore...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Cloud size={18} className="text-sapphire" />
+                        <span>Sync All Data to Firestore</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {cloudSyncMsg && (
+                  <div className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2 border ${cloudSyncMsg.error ? 'bg-red-50 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                    <CheckCircle2 size={16} />
+                    <span>{cloudSyncMsg.text}</span>
+                  </div>
+                )}
+
+                {/* Firestore Collections Overview */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { name: 'products', label: 'Products Collection', desc: 'Syncs full catalog & stock' },
+                    { name: 'orders', label: 'Orders Collection', desc: 'Syncs invoices & transactions' },
+                    { name: 'customers', label: 'Customers Collection', desc: 'Syncs registered customer accounts' },
+                    { name: 'settings', label: 'Settings Collection', desc: 'Syncs store & tax configuration' },
+                  ].map((col) => (
+                    <div key={col.name} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-gray-900">{col.label}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{col.desc}</p>
+                      </div>
+                      <span className="text-[10px] font-mono text-sapphire bg-blue-50 px-2 py-0.5 rounded-md mt-3 w-fit">
+                        /{col.name}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

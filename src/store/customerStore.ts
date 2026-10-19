@@ -84,9 +84,9 @@ export const useCustomerStore = create<CustomerStore>()(
             ),
           };
         }),
-      deleteCustomer: (id) =>
+      deleteCustomer: (idOrEmail) =>
         set((state) => ({
-          customers: state.customers.filter((c) => c.id !== id),
+          customers: state.customers.filter((c) => c.id !== idOrEmail && c.email.toLowerCase() !== idOrEmail.toLowerCase()),
         })),
       syncWithAuthUsers: (authUsers) =>
         set((state) => {

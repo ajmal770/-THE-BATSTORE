@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Banknote, ShieldCheck, Tag, ChevronDown, ChevronUp, X, Truck, Lock, Check, Package, ArrowRight, ShoppingBag } from 'lucide-react';
+import { CreditCard, Banknote, ShieldCheck, Tag, ChevronDown, ChevronUp, X, Truck, Lock, Check, Package, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { TextInput } from '../components/TextInput';
 import { useCartStore } from '../store/cartStore';
@@ -286,18 +286,31 @@ const Checkout: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-8 sm:mb-10 text-center">Checkout</h1>
 
+
         {/* Stepper */}
         <div className="flex items-center justify-center mb-10">
           <div className="flex items-center w-full max-w-lg">
-            <div className={`flex flex-col items-center gap-2 flex-1 ${step >= 1 ? 'text-sapphire' : 'text-gray-400'}`}>
+            <button
+              type="button"
+              onClick={() => { if (step > 1) { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
+              disabled={step === 1}
+              className={`flex flex-col items-center gap-2 flex-1 bg-transparent border-none p-0 transition-all ${step >= 1 ? 'text-sapphire' : 'text-gray-400'} ${step > 1 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+              title={step > 1 ? 'Go back to Shipping' : undefined}
+            >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= 1 ? 'bg-sapphire text-white shadow-md shadow-sapphire/20' : 'bg-gray-200 text-gray-500'}`}>1</div>
               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Shipping</span>
-            </div>
+            </button>
             <div className={`h-1 w-12 sm:w-24 rounded-full transition-colors ${step >= 2 ? 'bg-sapphire' : 'bg-gray-200'}`} />
-            <div className={`flex flex-col items-center gap-2 flex-1 ${step >= 2 ? 'text-sapphire' : 'text-gray-400'}`}>
+            <button
+              type="button"
+              onClick={() => { if (step > 2) { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
+              disabled={step <= 2}
+              className={`flex flex-col items-center gap-2 flex-1 bg-transparent border-none p-0 transition-all ${step >= 2 ? 'text-sapphire' : 'text-gray-400'} ${step > 2 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+              title={step > 2 ? 'Go back to Summary' : undefined}
+            >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= 2 ? 'bg-sapphire text-white shadow-md shadow-sapphire/20' : 'bg-gray-200 text-gray-500'}`}>2</div>
               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Summary</span>
-            </div>
+            </button>
             <div className={`h-1 w-12 sm:w-24 rounded-full transition-colors ${step >= 3 ? 'bg-sapphire' : 'bg-gray-200'}`} />
             <div className={`flex flex-col items-center gap-2 flex-1 ${step >= 3 ? 'text-sapphire' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= 3 ? 'bg-sapphire text-white shadow-md shadow-sapphire/20' : 'bg-gray-200 text-gray-500'}`}>3</div>
@@ -325,7 +338,14 @@ const Checkout: React.FC = () => {
               </div>
               <TextInput label="Phone Number" type="tel" {...register('phone')} error={errors.phone?.message} />
               
-              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-gray-100 flex justify-end">
+              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 sm:gap-4">
+                <button 
+                  type="button" 
+                  onClick={() => navigate('/cart')} 
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 hover:text-sapphire transition-all shadow-2xs cursor-pointer text-sm sm:text-base"
+                >
+                  <ArrowLeft size={18} /> Back to Cart
+                </button>
                 <button type="button" onClick={handleNextStep1} className="w-full sm:w-auto bg-sapphire hover:bg-deep-navy text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-lg shadow-sapphire/20 cursor-pointer">
                   Next: Review Order <ArrowRight size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -532,8 +552,12 @@ const Checkout: React.FC = () => {
               </div>
 
               <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 sm:gap-4">
-                <button type="button" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-gray-500 font-bold hover:text-sapphire px-6 py-2.5 sm:py-3 transition-colors cursor-pointer text-sm sm:text-base">
-                  Back to Shipping
+                <button 
+                  type="button" 
+                  onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 hover:text-sapphire transition-all shadow-2xs cursor-pointer text-sm sm:text-base"
+                >
+                  <ArrowLeft size={18} /> Back to Shipping
                 </button>
                 <button type="button" onClick={handleNextStep2} className="w-full sm:w-auto bg-sapphire hover:bg-deep-navy text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-lg shadow-sapphire/20 cursor-pointer">
                   Next: Payment <ArrowRight size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -545,11 +569,8 @@ const Checkout: React.FC = () => {
           {/* STEP 3: Payment Method */}
           {step === 3 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-2xl sm:rounded-3xl shadow-xl shadow-gray-200/30 p-4 sm:p-8 border border-gray-100/80">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-5 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-5 sm:mb-6">
                 <span>3. Payment Method</span>
-                <span className="text-[10px] sm:text-xs text-gray-400 font-medium flex items-center gap-1 w-fit">
-                  <Lock size={12} className="text-sapphire" /> 256-Bit Encrypted
-                </span>
               </h2>
               
               {/* Advanced Mode Selectors */}
@@ -683,8 +704,12 @@ const Checkout: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 sm:gap-4">
-                  <button type="button" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-gray-500 font-bold hover:text-sapphire px-6 py-2.5 sm:py-3 transition-colors cursor-pointer text-sm sm:text-base">
-                    Back to Summary
+                  <button 
+                    type="button" 
+                    onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-300 hover:text-sapphire transition-all shadow-2xs cursor-pointer text-sm sm:text-base"
+                  >
+                    <ArrowLeft size={18} /> Back to Summary
                   </button>
                   <button type="submit" disabled={isSubmitting} className="w-full sm:w-auto bg-gradient-to-r from-sapphire to-blue-600 text-white px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl font-extrabold hover:shadow-lg hover:shadow-sapphire/25 hover:from-deep-navy hover:to-sapphire transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 disabled:opacity-75 disabled:cursor-not-allowed text-base sm:text-lg">
                     {isSubmitting ? 'Processing...' : 'Place Order'} <ShieldCheck size={20} className="w-4 h-4 sm:w-5 sm:h-5" />

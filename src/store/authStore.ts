@@ -8,6 +8,9 @@ export interface AppUser {
   uid: string;
   email: string | null;
   displayName: string | null;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
   role: UserRole;
 }
 
@@ -32,6 +35,9 @@ export interface RegisteredUser {
   email: string;
   password: string;
   displayName: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
   role: UserRole;
   phone?: string;
   avatar?: string | null;
@@ -56,10 +62,10 @@ interface AuthState {
 }
 
 const defaultRegisteredUsers: RegisteredUser[] = [
-  { uid: 'USR-1', email: 'john@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'John Doe' },
-  { uid: 'USR-2', email: 'sarah.s@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Sarah Smith' },
-  { uid: 'USR-3', email: 'admin@thebatstore.com', password: 'Admin@123', role: 'ADMIN', displayName: 'Admin User' },
-  { uid: 'USR-4', email: 'mikej@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Mike Johnson' },
+  { uid: 'USR-1', email: 'john@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'John Doe', firstName: 'John', lastName: 'Doe', gender: 'male' },
+  { uid: 'USR-2', email: 'sarah.s@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Sarah Smith', firstName: 'Sarah', lastName: 'Smith', gender: 'female' },
+  { uid: 'USR-3', email: 'admin@thebatstore.com', password: 'Admin@123', role: 'ADMIN', displayName: 'Admin User', firstName: 'Admin', lastName: 'User', gender: 'other' },
+  { uid: 'USR-4', email: 'mikej@example.com', password: 'Password123', role: 'CUSTOMER', displayName: 'Mike Johnson', firstName: 'Mike', lastName: 'Johnson', gender: 'male' },
 ];
 
 export const useAuthStore = create<AuthState>()(
@@ -90,11 +96,16 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, error: 'Email address is already in use by another account.' };
         }
 
+        const computedDisplayName = newUser.displayName || [newUser.firstName, newUser.lastName].filter(Boolean).join(' ') || 'User';
+
         const createdUser: RegisteredUser = {
           uid: `USR-${Date.now().toString().slice(-4)}`,
           email: newUser.email,
           password: newUser.password,
-          displayName: newUser.displayName,
+          displayName: computedDisplayName,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          gender: newUser.gender,
           role: newUser.role || 'CUSTOMER',
         };
 
@@ -102,7 +113,7 @@ export const useAuthStore = create<AuthState>()(
         useNotificationStore.getState().addNotification({
           category: 'account',
           title: 'Welcome to The BatStore! 🎉',
-          message: `Hello ${newUser.displayName || 'there'}, your account has been created. Start exploring our exclusive collections!`,
+          message: `Hello ${createdUser.displayName || 'there'}, your account has been created. Start exploring our exclusive collections!`,
           link: '/profile',
         });
 
@@ -118,7 +129,7 @@ export const useAuthStore = create<AuthState>()(
             message: 'Your account password has been updated. If this was not you, please contact support.',
             link: '/profile',
           });
-        } else if (data.displayName || data.phone || data.shippingAddress || data.billingAddress) {
+        } else if (data.displayName || data.firstName || data.lastName || data.gender || data.phone || data.shippingAddress || data.billingAddress) {
           useNotificationStore.getState().addNotification({
             category: 'account',
             title: 'Profile Updated 👤',
@@ -132,13 +143,21 @@ export const useAuthStore = create<AuthState>()(
             u.uid === uid ? { ...u, ...data } : u
           ),
           // Also update the current active user if they are the one being updated
-          user: state.user?.uid === uid ? { ...state.user, displayName: data.displayName || state.user.displayName } : state.user
+          user: state.user?.uid === uid ? { 
+            ...state.user, 
+            displayName: data.displayName !== undefined ? data.displayName : state.user.displayName,
+            firstName: data.firstName !== undefined ? data.firstName : state.user.firstName,
+            lastName: data.lastName !== undefined ? data.lastName : state.user.lastName,
+            gender: data.gender !== undefined ? data.gender : state.user.gender,
+          } : state.user
         }));
       },
       deleteUser: (uid) =>
         set((state) => ({
           registeredUsers: state.registeredUsers.filter((u) => u.uid !== uid),
           adminAccounts: state.adminAccounts.filter((a) => a.uid !== uid),
+          user: state.user?.uid === uid ? null : state.user,
+          firebaseUser: state.user?.uid === uid ? null : state.firebaseUser,
         })),
     }),
     { 

@@ -38,6 +38,9 @@ export interface ProfilePreferences {
 
 export interface ProfileState {
   fullName: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
   avatar: string | null;
   phone: string;
   shippingAddress: Address;
@@ -46,6 +49,7 @@ export interface ProfileState {
   savedCards: PaymentCard[];
   preferences: ProfilePreferences;
   updateProfile: (data: Partial<ProfileState>) => void;
+  resetProfile: () => void;
   addAddress: (address: Address) => void;
   updateAddress: (id: string, address: Partial<Address>) => void;
   removeAddress: (id: string) => void;
@@ -57,6 +61,9 @@ export interface ProfileState {
 
 const initialState = {
   fullName: '',
+  firstName: '',
+  lastName: '',
+  gender: '',
   avatar: null,
   phone: '',
   shippingAddress: {
@@ -87,6 +94,7 @@ export const useProfileStore = create<ProfileState>()(
     (set) => ({
       ...initialState,
       updateProfile: (data) => set((state) => ({ ...state, ...data })),
+      resetProfile: () => set(() => ({ ...initialState })),
       addAddress: (address) => set((state) => {
         const isFirst = state.savedAddresses.length === 0;
         const newAddr = { ...address, isDefault: address.isDefault ?? isFirst };
